@@ -1,0 +1,38 @@
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap: 25px;
+  padding: 30px;
+}
+
+
+.skeleton-card {
+  background: white;
+  border-radius: 15px;
+  padding-bottom: 20px;
+  overflow: hidden;
+}
+
+
+.skeleton-image {
+  height: 220px;
+  background: #ddd;
+}
+
+
+.skeleton-line {
+  height: 15px;
+  background: #ddd;
+  margin: 15px;
+  border-radius: 8px;
+}
+
+
+.skeleton-line.title {
+  width: 70%;
+}
+
+
+.skeleton-line.small {
+  width: 40%;
+}
