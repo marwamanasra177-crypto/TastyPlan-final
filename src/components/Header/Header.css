@@ -1,32 +1,24 @@
-
-/* .body{
-    /* padding: top 500px; 
-}*/
- 
-.header {
+/* import "../../App.css";  */
+ .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
     width: 100%;
         background-color:#edf5e3;
-    height: 200px;
-    /* background-color: rgba(250, 247, 242); */
+    height: 170px;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
-    /* border-bottom: 1px solid #e5e5e5;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08); */
-
+    border-bottom: 1px solid #e5e5e5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 .logo-div {
 
     width: 20%;
     display: flex;
     justify-content: center;
-
-
 }
 .title {
     display: flex;
@@ -59,4 +51,19 @@
     border-radius: 99px;
     object-fit: cover;
 
+}
+.mode-icon {
+    height: 50px;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 20%;
+    object-fit: cover;
+    margin-right: 10px;
+
+}
+.dark .header {
+    background-color: #333;
+    border-color: #555;
 }

@@ -33,3 +33,6 @@
   margin: 5px 0;
   color: #666;
 }
+.dark .recipe-info  {
+    color: #090000;
+}

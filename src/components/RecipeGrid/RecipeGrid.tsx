@@ -4,18 +4,25 @@ import "./RecipeGrid.css";
 
 interface RecipeGridProps {
   meals: Meal[];
+  onSelectMeal: (meal: Meal) => void;
 }
-function RecipeGrid({ meals }: RecipeGridProps) {
+function RecipeGrid( {meals,onSelectMeal}: RecipeGridProps) 
+{
   return (
     <div className="recipe-grid">
-      {meals.map((meal) => (
-        <RecipeCard
-          key={meal.idMeal}
-          meal={meal}
-        />
-      ))}
+      {
+        meals.map((meal) => (
+          <RecipeCard
+            key={meal.idMeal}
+            meal={meal}
+            onSelectMeal={onSelectMeal}
+          />
+        ))
+      }
     </div>
   );
+
 }
+
 
 export default RecipeGrid;

@@ -1,5 +1,9 @@
 .recipe-grid {
-    margin-top: 250px;
+    /* margin-top: 70px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px; */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
   gap: 25px;

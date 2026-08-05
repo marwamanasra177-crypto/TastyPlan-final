@@ -1,6 +1,7 @@
 import "./SearchBar.css";
 import searchicon from "../../assets/icons/search_8478650.png"
 import { useEffect, useRef } from "react";
+
 interface SearchBarProps 
 {
     setSearch: (value: string) => void;

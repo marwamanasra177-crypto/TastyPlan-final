@@ -5,7 +5,6 @@ function useFetch<T>(url: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
 const fetchData = async () => {
       try {
         setLoading(true);
@@ -24,9 +23,6 @@ const fetchData = async () => {
         setLoading(false);
       }
     };
-
-
-
   useEffect(() => {
     if (!url) return;
     fetchData();

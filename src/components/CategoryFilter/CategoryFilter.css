@@ -1,0 +1,33 @@
+.category-filter{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px;
+}
+
+.categories button {
+    background: #edf5e3;
+    color: rgb(5, 0, 0);
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.categories button:hover {
+  transform: translateY(-5px);
+}
+.dark .categories button {
+    background-color: #333;
+    border-color: #555;
+    color: rgb(246, 245, 245);
+}
+.categories button.active {
+  background: #2e7d32;
+  color: white;
+}

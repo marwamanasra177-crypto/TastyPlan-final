@@ -1,0 +1,70 @@
+import type { Meal } from "../types/meal";
+export type Day = | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+export interface MealPlanState {
+    [key: string]: Meal[];
+}
+export const initialMealPlan: MealPlanState = {
+
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+    Sunday: []
+
+};
+export type MealPlanAction =
+    {
+        type: "ADD_MEAL";
+        payload: {
+            day: Day;
+            meal: Meal;
+        }
+    }
+    |
+    {
+        type: "REMOVE_MEAL";
+        payload: {
+            day: Day;
+            id: string;
+        }
+    }
+    |
+    {
+        type: "CLEAR_WEEK";
+    };
+
+export function mealPlanReducer(
+    state: MealPlanState,
+    action: MealPlanAction
+): MealPlanState {
+    switch (action.type) {
+        case "ADD_MEAL":
+            return {
+                ...state,
+                [action.payload.day]:
+                    [
+                        ...state[action.payload.day],
+                        action.payload.meal
+                    ]
+            };
+        case "REMOVE_MEAL":
+            return {
+                ...state,
+                [action.payload.day]:
+
+                    state[action.payload.day]
+                        .filter(
+                            meal =>
+                                meal.idMeal !== action.payload.id
+                        )
+            };
+        case "CLEAR_WEEK":
+            return initialMealPlan;
+        default:
+            return state;
+    }
+
+
+}
