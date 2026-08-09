@@ -1,11 +1,11 @@
 import type { Meal } from "../../types/meal";
 import "./RecipeCard.css";
 
-
 interface RecipeCardProps {
   meal: Meal;
   onSelectMeal: (meal: Meal) => void;
 }
+
 function RecipeCard( {meal,onSelectMeal}: RecipeCardProps) {
   return (
 

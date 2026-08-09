@@ -12,8 +12,6 @@ z-index:2000;
 
 }
 
-
-
 .modal{
 
 background:white;
@@ -30,9 +28,6 @@ padding:25px;
 position:relative;
 
 }
-
-
-
 .close{
 
 position:absolute;
@@ -47,9 +42,6 @@ font-size:25px;
 cursor:pointer;
 
 }
-
-
-
 .modal-image{
 
 width:100%;
@@ -60,9 +52,6 @@ object-fit:cover;
 border-radius:15px;
 
 }
-
-
-
 .instructions{
 
 line-height:1.7;

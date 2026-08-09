@@ -4,15 +4,13 @@ export interface MealPlanState {
     [key: string]: Meal[];
 }
 export const initialMealPlan: MealPlanState = {
-
+        Sunday: [],
     Monday: [],
     Tuesday: [],
     Wednesday: [],
     Thursday: [],
     Friday: [],
-    Saturday: [],
-    Sunday: []
-
+    Saturday: []
 };
 export type MealPlanAction =
     {

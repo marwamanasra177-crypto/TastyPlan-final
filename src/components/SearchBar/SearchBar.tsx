@@ -7,8 +7,9 @@ interface SearchBarProps
     setSearch: (value: string) => void;
 }
 
-function SearchBar({ setSearch }: SearchBarProps) {
+ function SearchBar({ setSearch }: SearchBarProps) {
         const inputRef = useRef<HTMLInputElement>(null);
+
         useEffect(() => {
             const handleShortcut = (event: KeyboardEvent) => {
                 if ((event.ctrlKey || event.metaKey) && event.key === "k") {

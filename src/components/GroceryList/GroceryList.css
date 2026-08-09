@@ -1,0 +1,32 @@
+.grocery-list {
+margin-top: 190px;
+    /* margin: 40px; */
+
+}
+
+.grocery-list h2 {
+
+    text-align: center;
+    margin-bottom: 25px;
+
+}
+
+.grocery-item {
+
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+
+}
+
+.dark .grocery-item {
+
+    color: black;
+
+}
+.completed {
+    text-decoration: line-through;
+    opacity: 0.5;
+}

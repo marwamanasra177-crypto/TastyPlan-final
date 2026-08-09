@@ -6,6 +6,7 @@ interface RecipeGridProps {
   meals: Meal[];
   onSelectMeal: (meal: Meal) => void;
 }
+
 function RecipeGrid( {meals,onSelectMeal}: RecipeGridProps) 
 {
   return (
