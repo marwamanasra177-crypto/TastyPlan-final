@@ -26,9 +26,10 @@ function Favorites(
             </h2>
 
             <RecipeGrid
-                meals={favorites}
-                onSelectMeal={onSelectMeal}
-            />
+    meals={favorites}
+    onSelectMeal={onSelectMeal}
+    className="favorites-grid"
+/>
 
         </section>
     );

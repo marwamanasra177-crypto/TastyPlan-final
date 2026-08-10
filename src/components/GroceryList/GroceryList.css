@@ -1,6 +1,5 @@
-.grocery-list {
+/* .grocery-list {
 margin-top: 190px;
-    /* margin: 40px; */
 
 }
 
@@ -29,4 +28,305 @@ margin-top: 190px;
 .completed {
     text-decoration: line-through;
     opacity: 0.5;
+} */
+
+.grocery-page {
+    min-height: 100vh;
+    padding: 220px 40px 50px;
+}
+
+.grocery-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Header */
+
+.grocery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.grocery-title h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.grocery-title p {
+    margin-top: 8px;
+    color: #777;
+    font-size: 15px;
+}
+
+/* Counter */
+
+.grocery-count {
+    background: #edf5e3;
+    color: #2e7d32;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-weight: 600;
+    border: 1px solid #dce8cf;
+}
+
+/* List */
+
+.grocery-list {
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* Item */
+
+.grocery-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 22px;
+    border-bottom: 1px solid #eeeeee;
+    transition: background 0.2s ease;
+}
+
+.grocery-item:last-child {
+    border-bottom: none;
+}
+
+.grocery-item:hover {
+    background: #fafcf8;
+}
+
+/* Checkbox */
+
+.grocery-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #2e7d32;
+}
+
+/* Ingredient */
+
+.grocery-ingredient {
+    flex: 1;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+/* Checked item */
+
+.grocery-item.checked .grocery-ingredient {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Quantity */
+
+.grocery-quantity {
+    min-width: 100px;
+    text-align: right;
+    color: #666;
+    font-size: 15px;
+}
+
+/* Empty state */
+
+.grocery-empty {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+    padding: 60px 30px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.grocery-empty-icon {
+    font-size: 55px;
+    margin-bottom: 15px;
+}
+
+.grocery-empty h2 {
+    margin-bottom: 10px;
+}
+
+.grocery-empty p {
+    color: #777;
+}
+
+
+.dark .grocery-page {
+    background: #cdc8c8;
+}
+
+.dark .grocery-title p {
+    color: #555;
+}
+
+.dark .grocery-count {
+    background: #333;
+    color: #81c784;
+    border-color: #555;
+}
+
+.dark .grocery-list {
+    background: #333;
+    border-color: #555;
+}
+
+.dark .grocery-item {
+    border-color: #555;
+}
+
+.dark .grocery-item:hover {
+    background: #3a3a3a;
+}
+
+.dark .grocery-ingredient {
+    color: white;
+}
+
+.dark .grocery-quantity {
+    color: #ccc;
+}
+
+.dark .grocery-item.checked .grocery-ingredient {
+    color: #999;
+}
+
+.dark .grocery-empty {
+    background: #333;
+    border-color: #555;
+    color: white;
+}
+
+.dark .grocery-empty p {
+    color: #ccc;
+}
+/* Add item */
+
+.add-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-item input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    outline: none;
+    font-size: 15px;
+    background: white;
+}
+
+.add-item input:focus {
+    border-color: #2e7d32;
+}
+
+.add-item button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 12px;
+    background: #2e7d32;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.add-item button:hover {
+    transform: translateY(-2px);
+}
+
+
+/* Filters */
+
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.filters button {
+    padding: 9px 18px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: white;
+    color: #555;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.filters button:hover {
+    background: #edf5e3;
+    color: #2e7d32;
+    border-color: #cbdcbb;
+}
+
+.filters button.active {
+    background: #2e7d32;
+    color: white;
+    border-color: #2e7d32;
+}
+
+
+/* Dark Mode */
+
+.dark .add-item input {
+    background: #333;
+    border-color: #555;
+    color: white;
+}
+
+.dark .add-item input::placeholder {
+    color: #aaa;
+}
+
+.dark .filters button {
+    background: #333;
+    border-color: #555;
+    color: #ddd;
+}
+
+.dark .filters button:hover {
+    background: #444;
+    color: #81c784;
+}
+
+.dark .filters button.active {
+    background: #2e7d32;
+    color: white;
+}
+
+
+@media (max-width: 600px) {
+
+    .grocery-page {
+        padding: 210px 15px 30px;
+    }
+
+    .grocery-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .grocery-title h1 {
+        font-size: 26px;
+    }
+
+    .grocery-item {
+        padding: 15px;
+    }
+
+    .grocery-quantity {
+        min-width: auto;
+    }
 }

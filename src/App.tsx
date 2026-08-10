@@ -4,10 +4,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import FavoritesPage from "./pages/Favorites/Favorites";
 import MealPlanPage from "./pages/MealPlan/MealPlan";
 import GroceryListPage from "./pages/GroceryList/GroceryList";
+import { useTheme } from "./components/Context/Context";
 
 function App() {
+    const { theme } = useTheme();
+
     return (
-        <BrowserRouter>
+         <div className={theme}>
+         <BrowserRouter>
 
             <Routes>
 
@@ -31,6 +35,8 @@ function App() {
             </Routes>
 
         </BrowserRouter>
+         </div>
+        
     );
 }
 

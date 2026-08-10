@@ -13,7 +13,15 @@
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
-
+.dark .planner-grid {
+    /* background-color: #333; */
+    color: rgb(246, 245, 245);
+}
+.dark .day-card {
+    background-color: #333;
+    border-color: #555;
+    color: rgb(246, 245, 245);
+}
 .day-card {
     background: white;
     border: 1px solid #ddd;

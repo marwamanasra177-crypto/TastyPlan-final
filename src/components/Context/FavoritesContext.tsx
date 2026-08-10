@@ -1,14 +1,11 @@
 import {createContext,useContext,useState} from "react";
 
 import type { Meal } from "../../types/meal";
+import useLocalStorage from "../../hooks/useLocalStorage";
 interface FavoritesContextType {
-
     favorites: Meal[];
-
     toggleFavorite: (meal: Meal) => void;
-
     isFavorite: (id: string) => boolean;
-
 }
 const FavoritesContext =
     createContext<FavoritesContextType | undefined>(
@@ -18,8 +15,11 @@ const FavoritesContext =
 export function FavoritesProvider(
     { children }: { children: React.ReactNode }
 ) {
-    const [favorites, setFavorites] =
-        useState<Meal[]>([]);
+   const [favorites, setFavorites] =
+    useLocalStorage<Meal[]>(
+        "favorites",
+        []
+    );
     const toggleFavorite = (meal: Meal) => {
         const exists =
             favorites.some(

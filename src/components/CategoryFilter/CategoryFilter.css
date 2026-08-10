@@ -1,16 +1,24 @@
 .category-filter{
-    margin-top: 170px;
-    display: flex;
+    
+     display: flex;
+     
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+    gap: 10px;
+    flex: 1;
 }
 .categories {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin: 20px;
+
+
 }
+/* .dark .category-filter{
+    background-color: #333;
+    border-color: #555;
+    color: rgb(246, 245, 245);
+} */
 
 .categories button {
     background: #edf5e3;

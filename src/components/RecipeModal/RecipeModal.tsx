@@ -136,27 +136,22 @@ function RecipeModal({
         >
           ✖
         </button>
-
         <img
           src={fullMeal.strMealThumb}
           alt={fullMeal.strMeal}
           className="modal-image"
         />
-
         <h2>
           {fullMeal.strMeal}
         </h2>
-
         <p>
           <strong>Category:</strong>{" "}
           {fullMeal.strCategory}
         </p>
-
         <p>
           <strong>Country:</strong>{" "}
           {fullMeal.strArea}
         </p>
-
         <button
           onClick={() =>
             toggleFavorite(fullMeal)
@@ -167,32 +162,21 @@ function RecipeModal({
             : "🤍 Add to Favorites"
           }
         </button>
-
         <h3>
           Ingredients
         </h3>
-
         <ul className="ingredients-list">
-
           {ingredients.map((item, index) => (
-
             <li key={index}>
-
               <input
                 type="checkbox"
               />
-
               {item.measure}{" "}
               {item.ingredient}
-
             </li>
-
           ))}
-
         </ul>
-
         <div>
-
           <select
             value={selectedDay}
             onChange={(e) =>
@@ -201,39 +185,25 @@ function RecipeModal({
               )
             }
           >
-
             {days.map((day) => (
-
               <option
                 key={day}
                 value={day}
               >
                 {day}
               </option>
-
             ))}
-
           </select>
-
           <button
             onClick={() => {
-
               dispatch({
-
                 type: "ADD_MEAL",
-
                 payload: {
-
                   day: selectedDay,
-
                   meal: fullMeal
-
                 }
-
               });
-
               closeModal();
-
             }}
           >
             Add to Meal Plan

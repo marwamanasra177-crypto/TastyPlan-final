@@ -4,12 +4,13 @@
     align-items: center;
     flex-wrap: nowrap;
     width: 100%;
-        background-color:#edf5e3;
+    background-color:#edf5e3;
+    z-index: 1190;
     height: 170px;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 1190;
     border-bottom: 1px solid #e5e5e5;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
@@ -27,8 +28,6 @@
 }
 .main-title {
     display: flex;
-
-
 }
 .subtitle {
     display: flex;
