@@ -1,9 +1,7 @@
 import { useState } from "react";
-
 import Favorites from "../../components/Favorites/Favorites";
 import RecipeModal from "../../components/RecipeModal/RecipeModal";
 import Header from "../../components/Header/Header";
-
 import type { Meal } from "../../types/meal";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import useDebounce from "../../hooks/useDebounce";

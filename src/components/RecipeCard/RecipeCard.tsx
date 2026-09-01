@@ -6,31 +6,34 @@ interface RecipeCardProps {
   onSelectMeal: (meal: Meal) => void;
 }
 
-function RecipeCard( {meal,onSelectMeal}: RecipeCardProps) {
-  return (
+function RecipeCard({ meal, onSelectMeal }: RecipeCardProps) {
+    return (
+        <div
+            className="recipe-card"
+            onClick={() => onSelectMeal(meal)}
+        >
+            <img
+                src={meal.image ?? ""}
+                alt={meal.name}
+                className="recipe-image"
+            />
 
-    <div
-      className="recipe-card"
-      onClick={() => onSelectMeal(meal)}
-    >
-      <img
-        src={meal.strMealThumb}
-        alt={meal.strMeal}
-        className="recipe-image"
-      />
-      <div className="recipe-info">
+            <div className="recipe-info">
 
-        <h3>
-          {meal.strMeal}
-        </h3>
-        <p>
-          {meal.strCategory}
-        </p>
-        <p>
-          {meal.strArea}
-        </p>
-      </div>
-    </div>
-  );
+                <h3>
+                    {meal.name}
+                </h3>
+
+                <p>
+                    {meal.category?.name}
+                </p>
+
+                <p>
+                    {meal.area?.name}
+                </p>
+
+            </div>
+        </div>
+    );
 }
 export default RecipeCard;

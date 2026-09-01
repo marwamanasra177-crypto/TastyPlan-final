@@ -25,7 +25,7 @@ export type MealPlanAction =
         type: "REMOVE_MEAL";
         payload: {
             day: Day;
-            id: string;
+            id: number;
         }
     }
     |
@@ -55,7 +55,7 @@ export function mealPlanReducer(
                     state[action.payload.day]
                         .filter(
                             meal =>
-                                meal.idMeal !== action.payload.id
+                                meal.id !== action.payload.id
                         )
             };
         case "CLEAR_WEEK":

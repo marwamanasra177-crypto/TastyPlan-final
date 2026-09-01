@@ -23,34 +23,24 @@ const days: Day[] = [
   "Sunday"
 ];
 
-function RecipeModal({
-  meal,
-  closeModal,
-}: RecipeModalProps) {
+function RecipeModal({ meal,closeModal,}: RecipeModalProps) {
 
-  const {
-    toggleFavorite,
-    isFavorite
-  } = useFavorites();
+  const { toggleFavorite,isFavorite} = useFavorites();
 
   const { dispatch } = useMealPlan();
 
-  const [selectedDay, setSelectedDay] =
-    useState<Day>("Monday");
-  const url = meal
-    ? mealDetails(meal.idMeal)
-    : "";
+  const [selectedDay, setSelectedDay] =useState<Day>("Monday");
 
-  const { data, loading, error } =
-    useFetch<MealsResponse>(url);
+  const url = meal ? mealDetails(meal.id) : "";
 
+const { data, loading, error } =useFetch<Meal>(url);
   if (!meal) {
     return null;
   }
 
-  const favorite = isFavorite(meal.idMeal);
+  const favorite = isFavorite(meal.id);
 
-  const fullMeal = data?.meals?.[0];
+const fullMeal = data;
 
   if (loading) {
     return (
@@ -102,28 +92,8 @@ function RecipeModal({
     return null;
   }
 
-  const ingredients = [];
 
-  for (let i = 1; i <= 20; i++) {
-
-    const ingredient =
-      fullMeal[`strIngredient${i}`];
-
-    const measure =
-      fullMeal[`strMeasure${i}`];
-
-    if (
-      ingredient &&
-      ingredient.trim() !== ""
-    ) {
-
-      ingredients.push({
-        ingredient,
-        measure,
-      });
-
-    }
-  }
+ const ingredients = fullMeal.mealIngredients ?? [];
 
   return (
     <div className="modal-overlay">
@@ -137,20 +107,20 @@ function RecipeModal({
           ✖
         </button>
         <img
-          src={fullMeal.strMealThumb}
-          alt={fullMeal.strMeal}
+          src={fullMeal.image}
+          alt={fullMeal.name}
           className="modal-image"
         />
         <h2>
-          {fullMeal.strMeal}
+          {fullMeal.name}
         </h2>
         <p>
           <strong>Category:</strong>{" "}
-          {fullMeal.strCategory}
+          {fullMeal.category?.name}
         </p>
         <p>
           <strong>Country:</strong>{" "}
-          {fullMeal.strArea}
+          {fullMeal.area?.name}
         </p>
         <button
           onClick={() =>
@@ -165,17 +135,23 @@ function RecipeModal({
         <h3>
           Ingredients
         </h3>
-        <ul className="ingredients-list">
-          {ingredients.map((item, index) => (
-            <li key={index}>
-              <input
-                type="checkbox"
-              />
-              {item.measure}{" "}
-              {item.ingredient}
-            </li>
-          ))}
-        </ul>
+       <ul className="ingredients-list">
+
+    {ingredients.map((item) => (
+
+        <li key={item.id}>
+
+            <input type="checkbox" />
+
+            {item.measure && `${item.measure} `}
+
+            {item.ingredient.name}
+
+        </li>
+
+    ))}
+
+</ul>
         <div>
           <select
             value={selectedDay}
@@ -212,17 +188,19 @@ function RecipeModal({
         </div>
 
         <h3>
-          Instructions
+          Instructions 
+          {/* <br/> */}
         </h3>
 
         <p className="instructions">
-          {fullMeal.strInstructions}
+          {fullMeal.instructions}
+         
         </p>
 
-        {fullMeal.strYoutube && (
+        {fullMeal.youtubeUrl && (
 
           <a
-            href={fullMeal.strYoutube}
+            href={fullMeal.youtubeUrl}
             target="_blank"
             rel="noreferrer"
           >

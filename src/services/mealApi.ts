@@ -1,20 +1,30 @@
-const BASE_URL = "https://www.themealdb.com/api/json/v1/1";
+const BASE_URL = "http://localhost:5000/api";
 
+export const allMeals = () =>
+    `${BASE_URL}/meals`;
 export const searchMeals = (query: string) =>
-  `${BASE_URL}/search.php?s=${query}`;
+    `${BASE_URL}/meals/search?name=${encodeURIComponent(query)}`;
 
 export const randomMeal = () =>
-  `${BASE_URL}/random.php`;
+    `${BASE_URL}/meals/random`;
 
 export const categories = () =>
-  `${BASE_URL}/categories.php`;
+    `${BASE_URL}/categories`;
 
-export const filterByArea = (area: string) =>
-  `${BASE_URL}/filter.php?a=${area}`;
+export const areas = () =>
+    `${BASE_URL}/areas`;
 
-export const mealDetails = (id:string) =>
-  `${BASE_URL}/lookup.php?i=${id}`;
+export const ingredients = () =>
+    `${BASE_URL}/ingredients`;
+
+export const mealDetails = (id: number) =>
+    `${BASE_URL}/meals/${id}`;
 
 export const filterByCategory = (category: string) =>
-  `${BASE_URL}/filter.php?c=${category}`;
+    `${BASE_URL}/meals/category/${encodeURIComponent(category)}`;
 
+export const filterByArea = (area: string) =>
+    `${BASE_URL}/meals/area/${encodeURIComponent(area)}`;
+
+export const filterByIngredient = (ingredient: string) =>
+    `${BASE_URL}/meals/ingredient/${encodeURIComponent(ingredient)}`;

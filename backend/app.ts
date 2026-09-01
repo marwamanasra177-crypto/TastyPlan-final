@@ -1,0 +1,113 @@
+import express from "express";
+import mealRoutes from "./routes/mealRoutes.js";
+import dataRoutes from "./routes/dataRoutes.js";
+import cors from "cors";
+import { AppDataSource } from "./data-source.js";
+import { engine } from "express-handlebars";
+import path from "path";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
+const app = express();
+
+app.engine(
+    "hbs",
+    engine({
+        extname: ".hbs",
+        defaultLayout: "main",
+
+        layoutsDir: path.join(
+            process.cwd(),
+            "views/layouts"
+        ),
+
+        helpers: {
+            eq: (a: any, b: any) => a === b,
+        },
+    })
+);
+
+app.set("view engine", "hbs");
+
+app.set(
+    "views",
+    path.join(process.cwd(), "views")
+);
+
+const PORT =
+    Number(process.env.PORT) || 5000;
+
+app.use(
+    express.static(
+        path.join(process.cwd(), "public")
+    )
+);
+
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        credentials: true,
+    })
+);
+
+app.use(express.json());
+
+app.use(
+    express.urlencoded({
+        extended: true,
+    })
+);
+
+app.use(
+    "/dashboard",
+    dashboardRoutes
+);
+
+app.get("/", (req, res) => {
+
+    res.json({
+        message:
+            "TastyPlan API is running!",
+    });
+
+});
+
+app.use(
+    "/api/meals",
+    mealRoutes
+);
+
+app.use(
+    "/api",
+    dataRoutes
+);
+
+app.use(
+    "/api/auth",
+    authRoutes
+);
+
+AppDataSource.initialize()
+    .then(() => {
+
+        console.log(
+            "Database connected successfully"
+        );
+
+        app.listen(PORT, () => {
+
+            console.log(
+                `Server running on http://localhost:${PORT}`
+            );
+
+        });
+
+    })
+    .catch((error) => {
+
+        console.error(
+            "Database connection failed:",
+            error
+        );
+
+    });

@@ -1,0 +1,133 @@
+
+<div class="page-header">
+
+    <div>
+        <h2>
+            {{#if isCreate}}
+                Add User
+            {{else}}
+                Edit User
+            {{/if}}
+        </h2>
+
+        <p>
+            Manage user information
+        </p>
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    <form
+        method="POST"
+        action="{{#if isCreate}}/dashboard/users{{else}}/dashboard/users/{{user.id}}/edit{{/if}}"
+    >
+
+        <div class="form-group">
+
+            <label for="name">
+                Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{user.name}}"
+                placeholder="Enter name"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="email">
+                Email
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{user.email}}"
+                placeholder="Enter email"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="{{#if isEdit}}Leave empty to keep current password{{else}}Enter password{{/if}}"
+                {{#if isCreate}}required{{/if}}
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="role">
+                Role
+            </label>
+
+            <select id="role" name="role" required>
+
+    <option
+        value="user"
+        {{#unless isAdmin}}selected{{/unless}}
+    >
+        User
+    </option>
+
+    <option
+        value="admin"
+        {{#if isAdmin}}selected{{/if}}
+    >
+        Admin
+    </option>
+
+</select>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                {{#if isCreate}}
+                    Create User
+                {{else}}
+                    Save Changes
+                {{/if}}
+            </button>
+
+            <a
+                href="/dashboard/users"
+                class="btn-secondary"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+

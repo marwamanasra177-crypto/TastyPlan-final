@@ -1,25 +1,44 @@
+  body {
+    margin: 0;
+}
  .header {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
     flex-wrap: nowrap;
     width: 100%;
+    flex-direction: column;
     background-color:#edf5e3;
     z-index: 1190;
-    height: 170px;
+    height: 140px;
     position: fixed;
-    top: 0;
-    left: 0;
     z-index: 1190;
     border-bottom: 1px solid #e5e5e5;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.header-up{
+    width: 100%;
+
+}
+.header-down{
+display: flex;
+justify-content: space-evenly;
+gap: 1100px;
+width: 100%;
+z-index: 2000;
+/* justify-content: center; */
+align-items: center;
+
 }
 .logo-div {
     width: 20%;
     display: flex;
     justify-content: center;
 }
+
 .title {
+    position: relative;
+    top: 0%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -50,13 +69,15 @@
 
 }
 .mode-icon {
-    height: 50px;
-    width: 50px;
+    background-color: #edf5e3;
+    height: 30px;
+    width: 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     border-radius: 20%;
-    object-fit: cover;
+    /* object-fit: cover; */
+    z-index: 2000;
     margin-right: 10px;
 
 }
@@ -66,11 +87,13 @@
 }
 .navigation {
     display: flex;
-    margin-top: 120px;
+    margin-top: 20px;
     z-index: 1001;
     align-items: center;
     justify-content: center;
     gap: 25px;
+    width: 100%;
+
 }
 
 .navigation a {
@@ -91,3 +114,8 @@
 .dark .navigation a:hover {
     color: #81c784;
 }
+
+
+
+
+

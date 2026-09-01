@@ -1,11 +1,22 @@
 .light {
+  width: 100%;
+  /* display: flex; */
+  position: relative;
+  left: 0%;
+  right: 0%;
   background-color: #ffffff;
   color: #222;
   min-height: 100vh;
 }
 
 
+
 .dark {
+  /* display: flex; */
+  position: relative;
+  left: 0%;
+  right: 0%;
+  width: 100%;
   background-color: #cdc8c8;
   color: white;
   min-height: 100vh;

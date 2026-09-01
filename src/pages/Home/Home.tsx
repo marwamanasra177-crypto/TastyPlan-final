@@ -18,8 +18,10 @@ import type { Meal } from "../../types/meal"
 
 function Home() {
     const [search, setSearch] = useState("");
+
     const [selectedCategory, setSelectedCategory] = useState("");
-    const debouncedSearch = useDebounce(search, 500);
+    const searchDelay :number = 500;
+    const debouncedSearch = useDebounce(search, searchDelay);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
     const [randomRecipe, setRandomRecipe] = useState<Meal | null>(null);
 
@@ -34,6 +36,7 @@ function Home() {
     const { data, loading, error } = useFetch<MealsResponse>(url);
 
     const { theme } = useTheme();
+    
     const getRandomMeal = async () => {
         try {
             const response = await fetch(randomMeal());
@@ -65,6 +68,7 @@ function Home() {
                 </button>
                 
             </div>
+            
             {loading && <LoadingSkeleton />}
             {error && <p>{error}</p>}
             {data?.meals && data.meals.length > 0 && (

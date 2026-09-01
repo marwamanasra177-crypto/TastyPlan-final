@@ -15,14 +15,16 @@
   transform: translateY(-5px);
 }
 .category-filter-container {
+  width: 100%;
   background-color: #edf5e3;
+  left: 0%;
+  right: 0%;
   z-index: 1100;
   position: fixed;
-  margin-top: 160px;
+  margin-top: 141px;
  display: flex;
     align-items: center;
     gap: 15px;
-    width: 100%;
 }
 .dark .random-meal-button {
     background-color: #333;

@@ -5,7 +5,7 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 interface FavoritesContextType {
     favorites: Meal[];
     toggleFavorite: (meal: Meal) => void;
-    isFavorite: (id: string) => boolean;
+    isFavorite: (id: number) => boolean;
 }
 const FavoritesContext =
     createContext<FavoritesContextType | undefined>(
@@ -23,13 +23,13 @@ export function FavoritesProvider(
     const toggleFavorite = (meal: Meal) => {
         const exists =
             favorites.some(
-                (item) => item.idMeal === meal.idMeal
+                (item) => item.id === meal.id
             );
         if (exists) {
 
             setFavorites(
                 favorites.filter(
-                    (item) => item.idMeal !== meal.idMeal
+                    (item) => item.id !== meal.id
                 )
             );
 
@@ -44,9 +44,9 @@ export function FavoritesProvider(
             );
         }
     };
-    const isFavorite = (id: string) => {
+    const isFavorite = (id: number) => {
         return favorites.some(
-            (item) => item.idMeal === id
+            (item) => item.id === id
         );
 
     };

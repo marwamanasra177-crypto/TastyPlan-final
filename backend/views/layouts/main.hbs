@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{title}} | TastyPlan</title>
+
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <h2>🍴 TastyPlan</h2>
+                <span>Admin Dashboard</span>
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a href="/dashboard">
+                    Dashboard
+                </a>
+
+                <a href="/dashboard/meals">
+                    Meals
+                </a>
+
+                <a href="/dashboard/categories">
+                    Categories
+                </a>
+
+                <a href="/dashboard/areas">
+                    Areas
+                </a>
+
+                <a href="/dashboard/ingredients">
+                    Ingredients
+                </a>
+
+                <a href="/dashboard/users">
+                    Users
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <a href="/dashboard/logout">
+                    Logout
+                </a>
+
+            </div>
+
+        </aside>
+
+
+        <main class="main-content">
+
+            <header class="topbar">
+
+                <h1>{{title}}</h1>
+
+                <div class="admin-info">
+                    Admin
+                </div>
+
+            </header>
+
+
+            <section class="content">
+
+                {{{body}}}
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

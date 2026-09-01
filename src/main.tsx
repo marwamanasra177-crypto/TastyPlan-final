@@ -5,6 +5,8 @@ import App from "./App";
 
 import { ThemeProvider } from "./components/Context/Context";
 
+import { AuthProvider } from "./components/Context/AuthContext";
+
 import { FavoritesProvider } 
 from "./components/Context/FavoritesContext";
 
@@ -16,16 +18,20 @@ createRoot(document.getElementById("root")!).render(
 
   <ThemeProvider>
 
-    <FavoritesProvider>
+    <AuthProvider>
 
-      <MealPlanProvider>
+      <FavoritesProvider>
 
-        <App />
+        <MealPlanProvider>
 
-      </MealPlanProvider>
+          <App />
 
-    </FavoritesProvider>
-    
+        </MealPlanProvider>
+
+      </FavoritesProvider>
+
+    </AuthProvider>
+
   </ThemeProvider>
 
 );

@@ -50,36 +50,24 @@ function GroceryList() {
     Object.values(mealPlan).forEach((meals) => {
 
         meals.forEach((meal) => {
+meal.mealIngredients?.forEach((mealIngredient) => {
 
-            for (let i = 1; i <= 20; i++) {
+    const ingredient =
+        mealIngredient.ingredient.name;
 
-                const ingredient =
-                    meal[`strIngredient${i}`];
+    const measure =
+        mealIngredient.measure;
 
-                const measure =
-                    meal[`strMeasure${i}`];
+    const item =
+        `${measure ?? ""} ${ingredient}`.trim();
 
-                if (
-                    ingredient &&
-                    ingredient.trim() !== ""
-                ) {
+    if (groceryItems[item]) {
+        groceryItems[item]++;
+    } else {
+        groceryItems[item] = 1;
+    }
 
-                    const item =
-                        `${measure ?? ""} ${ingredient}`.trim();
-
-                    if (groceryItems[item]) {
-
-                        groceryItems[item]++;
-
-                    } else {
-
-                        groceryItems[item] = 1;
-
-                    }
-
-                }
-
-            }
+});
 
         });
 

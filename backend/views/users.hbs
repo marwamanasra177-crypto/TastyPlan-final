@@ -1,0 +1,95 @@
+<div class="page-header">
+
+    <div>
+        <h2>Users</h2>
+        <p>Manage registered users</p>
+    </div>
+
+    <a href="/dashboard/users/new" class="btn-primary">
+        + Add User
+    </a>
+
+</div>
+
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {{#each users}}
+
+                <tr>
+
+                    <td>{{id}}</td>
+
+                    <td>{{name}}</td>
+
+                    <td>{{email}}</td>
+
+                    <td>
+
+                        <span class="role {{role}}">
+                            {{role}}
+                        </span>
+
+                    </td>
+
+                    <td>
+                        {{createdAt}}
+                    </td>
+
+                    <td class="actions">
+
+                        <a href="/dashboard/users/{{id}}/edit">
+                            Edit
+                        </a>
+
+                        <form
+                            action="/dashboard/users/{{id}}/delete"
+                            method="POST"
+                            style="display:inline;"
+                        >
+
+                            <button type="submit">
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+            {{else}}
+
+                <tr>
+
+                    <td colspan="6">
+                        No users found.
+                    </td>
+
+                </tr>
+
+            {{/each}}
+
+        </tbody>
+
+    </table>
+
+</div>

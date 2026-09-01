@@ -37,10 +37,10 @@ const { mealPlan, dispatch } = useMealPlan();
                                 : (
                                     meals.map((meal) => (
     <div
-        key={meal.idMeal}
+        key={meal.id}
         className="meal-item"
     >
-        <span>{meal.strMeal}</span>
+        <span>{meal.name}</span>
 
         <button
             onClick={() =>
@@ -48,7 +48,7 @@ const { mealPlan, dispatch } = useMealPlan();
                     type: "REMOVE_MEAL",
                     payload: {
                         day: day as Day,
-                        id: meal.idMeal,
+                        id: meal.id,
                     },
                 })
             }

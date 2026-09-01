@@ -1,0 +1,76 @@
+<div class="page-header">
+
+    <div>
+
+        <h2>
+
+            {{#if isCreate}}
+                Add Area
+            {{else}}
+                Edit Area
+            {{/if}}
+
+        </h2>
+
+        <p>
+            Manage area information
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    <form
+        method="POST"
+        action="{{#if isCreate}}/dashboard/areas{{else}}/dashboard/areas/{{area.id}}/edit{{/if}}"
+    >
+
+        <div class="form-group">
+
+            <label for="name">
+                Area Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{area.name}}"
+                placeholder="Enter area name"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+
+                {{#if isCreate}}
+                    Create Area
+                {{else}}
+                    Save Changes
+                {{/if}}
+
+            </button>
+
+
+            <a
+                href="/dashboard/areas"
+                class="btn-secondary"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

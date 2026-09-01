@@ -5,7 +5,8 @@ import FavoritesPage from "./pages/Favorites/Favorites";
 import MealPlanPage from "./pages/MealPlan/MealPlan";
 import GroceryListPage from "./pages/GroceryList/GroceryList";
 import { useTheme } from "./components/Context/Context";
-
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
 function App() {
     const { theme } = useTheme();
 
@@ -14,7 +15,15 @@ function App() {
          <BrowserRouter>
 
             <Routes>
+<Route
+    path="/login"
+    element={<Login />}
+/>
 
+<Route
+    path="/register"
+    element={<Register />}
+/>
                 <Route
                     path="/"
                     element={<Home />}

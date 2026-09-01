@@ -11,7 +11,6 @@ function MealPlanPage() {
         <div>
             <Header />
                         <SearchBar setSearch={setSearch} />
-
             <MealPlanner />
         </div>
     );

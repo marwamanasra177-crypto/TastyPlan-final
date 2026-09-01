@@ -11,23 +11,25 @@ interface RecipeGridProps {
     onSelectMeal: (meal: Meal) => void;
     className?: string;
 }
+function RecipeGrid({
+    meals,
+    onSelectMeal,
+    className
+}: RecipeGridProps) {
 
-function RecipeGrid( {meals,onSelectMeal, className}: RecipeGridProps) 
-{
-  return (
-<div className={`recipe-grid ${className ?? ""}`}>      {
-        meals.map((meal) => (
-          <RecipeCard
-            key={meal.idMeal}
-            meal={meal}
-            onSelectMeal={onSelectMeal}
-          />
-        ))
-      }
-    </div>
-  );
+    console.log("Meals:", meals);
 
+    return (
+        <div className={`recipe-grid ${className ?? ""}`}>
+            {meals.map((meal) => (
+                <RecipeCard
+                    key={meal.id}
+                    meal={meal}
+                    onSelectMeal={onSelectMeal}
+                />
+            ))}
+        </div>
+    );
 }
 
-
-export default RecipeGrid;
+export default RecipeGrid 
