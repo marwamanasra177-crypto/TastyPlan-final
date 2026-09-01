@@ -7,6 +7,8 @@ import GroceryListPage from "./pages/GroceryList/GroceryList";
 import { useTheme } from "./components/Context/Context";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import PublicOnlyRoute from "./components/ProtectedRoute/PublicOnlyRoute";
 function App() {
     const { theme } = useTheme();
 
@@ -17,28 +19,52 @@ function App() {
             <Routes>
 <Route
     path="/login"
-    element={<Login />}
+    element={
+        <PublicOnlyRoute>
+            <Login />
+        </PublicOnlyRoute>
+    }
 />
 
 <Route
     path="/register"
-    element={<Register />}
+    element={
+        <PublicOnlyRoute>
+            <Register />
+        </PublicOnlyRoute>
+    }
 />
                 <Route
                     path="/"
-                    element={<Home />}
+                    element={
+                        <ProtectedRoute>
+                            <Home />
+                        </ProtectedRoute>
+                    }
                 />
                 <Route
                     path="/favorites"
-                    element={<FavoritesPage />}
+                    element={
+                        <ProtectedRoute>
+                            <FavoritesPage />
+                        </ProtectedRoute>
+                    }
                 />
                 <Route
                     path="/meal-plan"
-                    element={<MealPlanPage />}
+                    element={
+                        <ProtectedRoute>
+                            <MealPlanPage />
+                        </ProtectedRoute>
+                    }
                 />
                 <Route
                     path="/grocery-list"
-                    element={<GroceryListPage />}
+                    element={
+                        <ProtectedRoute>
+                            <GroceryListPage />
+                        </ProtectedRoute>
+                    }
                 />
 
             </Routes>
