@@ -1,8 +1,10 @@
 import {
     createContext,
+    useCallback,
     useContext,
     useEffect,
-    useReducer
+    useReducer,
+    useState,
 } from "react";
 
 import {
@@ -15,13 +17,17 @@ import type {
     MealPlanAction
 } from "../../reducer/mealPlanReducer";
 
-import useLocalStorage from "../../hooks/useLocalStorage";
+import { useAuth } from "../Context/AuthContext";
+
+const MEALPLAN_URL = "http://localhost:5000/api/mealplan";
 
 interface MealPlanContextType {
 
     mealPlan: MealPlanState;
 
     dispatch: React.Dispatch<MealPlanAction>;
+
+    loading: boolean;
 
 }
 
@@ -38,34 +44,156 @@ export function MealPlanProvider(
     }
 ) {
 
-    const [
-        storedMealPlan,
-        setStoredMealPlan
-    ] = useLocalStorage<MealPlanState>(
-        "mealPlan",
-        initialMealPlan
-    );
+    const { user, token } = useAuth();
 
     const [
         mealPlan,
-        dispatch
+        rawDispatch
     ] = useReducer(
         mealPlanReducer,
-        storedMealPlan
+        initialMealPlan
     );
 
+    const [loading, setLoading] = useState(true);
+
+    const authHeaders = useCallback((): HeadersInit => {
+
+        const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+        };
+
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        return headers;
+
+    }, [token]);
+
+    // Load the meal plan from the backend whenever the logged-in user changes
     useEffect(() => {
 
-        setStoredMealPlan(mealPlan);
+        if (!user) {
+            rawDispatch({
+                type: "SET_PLAN",
+                payload: initialMealPlan,
+            });
+            setLoading(false);
+            return;
+        }
 
-    }, [mealPlan, setStoredMealPlan]);
+        let cancelled = false;
+
+        const loadPlan = async () => {
+
+            try {
+
+                const response = await fetch(MEALPLAN_URL, {
+                    credentials: "include",
+                    headers: authHeaders(),
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!cancelled) {
+                    rawDispatch({
+                        type: "SET_PLAN",
+                        payload: data.mealPlan || initialMealPlan,
+                    });
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to load meal plan:",
+                    error
+                );
+
+            } finally {
+
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadPlan();
+
+        return () => {
+            cancelled = true;
+        };
+
+    }, [user, authHeaders]);
+
+    // Wraps the reducer's dispatch so every action also syncs to the backend,
+    // while keeping the exact same dispatch(action) signature everywhere else
+    const dispatch: React.Dispatch<MealPlanAction> = (action) => {
+
+        rawDispatch(action);
+
+        if (!user) {
+            return;
+        }
+
+        const sync = async () => {
+
+            try {
+
+                if (action.type === "ADD_MEAL") {
+
+                    await fetch(MEALPLAN_URL, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: authHeaders(),
+                        body: JSON.stringify({
+                            day: action.payload.day,
+                            mealId: action.payload.meal.id,
+                        }),
+                    });
+
+                } else if (action.type === "REMOVE_MEAL") {
+
+                    await fetch(
+                        `${MEALPLAN_URL}/${action.payload.day}/${action.payload.id}`,
+                        {
+                            method: "DELETE",
+                            credentials: "include",
+                            headers: authHeaders(),
+                        }
+                    );
+
+                } else if (action.type === "CLEAR_WEEK") {
+
+                    await fetch(MEALPLAN_URL, {
+                        method: "DELETE",
+                        credentials: "include",
+                        headers: authHeaders(),
+                    });
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to sync meal plan:",
+                    error
+                );
+            }
+        };
+
+        sync();
+    };
 
     return (
 
         <MealPlanContext.Provider
             value={{
                 mealPlan,
-                dispatch
+                dispatch,
+                loading,
             }}
         >
 

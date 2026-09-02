@@ -9,7 +9,15 @@ import { Area } from "../entities/Area.js";
 import { Ingredient } from "../entities/Ingredient.js";
 import { Meal } from "../entities/Meal.js";
 import { MealIngredient } from "../entities/MealIngredient.js";
+import { Favorite } from "../entities/Favorite.js";
+import { MealPlan } from "../entities/MealPlan.js";
 const router = Router();
+
+const favoriteRepository =
+    AppDataSource.getRepository(Favorite);
+
+const mealPlanRepository =
+    AppDataSource.getRepository(MealPlan);
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -350,6 +358,92 @@ router.post("/users", requireAdmin, async (req, res) => {
 
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| User Detail - Favorites & Meal Plan
+|--------------------------------------------------------------------------
+*/
+
+router.get("/users/:id", requireAdmin, async (req, res) => {
+
+    try {
+
+        const id = Number(req.params.id);
+
+        const user = await userRepository.findOne({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                createdAt: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const favorites = await favoriteRepository.find({
+            where: {
+                user: { id },
+            },
+            relations: {
+                meal: true,
+            },
+            order: {
+                createdAt: "DESC",
+            },
+        });
+
+        const planEntries = await mealPlanRepository.find({
+            where: {
+                user: { id },
+            },
+            relations: {
+                meal: true,
+            },
+            order: {
+                createdAt: "ASC",
+            },
+        });
+
+        const DAYS = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ];
+
+        const mealPlanByDay = DAYS.map((day) => ({
+            day,
+            meals: planEntries
+                .filter((entry) => entry.day === day)
+                .map((entry) => entry.meal),
+        }));
+
+        res.render("user-detail", {
+            title: `${user.name} - Details`,
+            admin: res.locals.admin,
+            user,
+            favorites: favorites.map((favorite) => favorite.meal),
+            mealPlanByDay,
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).send("Failed to load user details");
+
+    }
+
+});
 
 /*
 |--------------------------------------------------------------------------

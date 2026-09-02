@@ -4,12 +4,14 @@ import {
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
+    Unique,
 } from "typeorm";
 
 import { User } from "./User.js";
 import { Meal } from "./Meal.js";
 
 @Entity("favorites")
+@Unique(["user", "meal"])
 export class Favorite {
 
     @PrimaryGeneratedColumn()

@@ -1,0 +1,132 @@
+<div class="page-header">
+
+    <div>
+        <h2>{{user.name}}</h2>
+        <p>{{user.email}} &middot; <span class="role {{user.role}}">{{user.role}}</span></p>
+    </div>
+
+    <a href="/dashboard/users" class="btn-primary">
+        &larr; Back to Users
+    </a>
+
+</div>
+
+
+<div class="table-card">
+
+    <h3 style="padding: 16px 16px 0;">
+        Favorites ({{favorites.length}})
+    </h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Image</th>
+                <th>Meal</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {{#each favorites}}
+
+                <tr>
+
+                    <td>
+
+                        {{#if image}}
+
+                            <img
+                                src="{{image}}"
+                                alt="{{name}}"
+                                class="meal-thumbnail"
+                            >
+
+                        {{else}}
+
+                            No image
+
+                        {{/if}}
+
+                    </td>
+
+                    <td>
+                        {{name}}
+                    </td>
+
+                </tr>
+
+            {{else}}
+
+                <tr>
+                    <td colspan="2">
+                        No favorites yet.
+                    </td>
+                </tr>
+
+            {{/each}}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="table-card" style="margin-top: 24px;">
+
+    <h3 style="padding: 16px 16px 0;">
+        Weekly Meal Plan
+    </h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Day</th>
+                <th>Meals</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {{#each mealPlanByDay}}
+
+                <tr>
+
+                    <td>
+                        {{day}}
+                    </td>
+
+                    <td>
+
+                        {{#if meals.length}}
+
+                            {{#each meals}}
+                                <span class="role user" style="margin-right: 6px;">
+                                    {{name}}
+                                </span>
+                            {{/each}}
+
+                        {{else}}
+
+                            No meals planned
+
+                        {{/if}}
+
+                    </td>
+
+                </tr>
+
+            {{/each}}
+
+        </tbody>
+
+    </table>
+
+</div>

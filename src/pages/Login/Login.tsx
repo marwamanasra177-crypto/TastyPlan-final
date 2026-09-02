@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/Context/AuthContext";
+import "./Login.css";
 
 function Login() {
 
@@ -63,57 +64,69 @@ const handleLogin = async (e: React.FormEvent) => {
 };
 
 return (
-    <div>
+    <div className="auth-page">
 
-        <h1>Login</h1>
+        <div className="auth-card">
 
-        <form onSubmit={handleLogin}>
+            <div className="auth-logo">🍲</div>
 
-            <div>
-                <label>Email</label>
+            <h1>Welcome Back</h1>
+            <p className="auth-subtitle">
+                Log in to your TastyPlan account
+            </p>
 
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) =>
-                        setEmail(e.target.value)
-                    }
-                    required
-                />
-            </div>
+            <form className="auth-form" onSubmit={handleLogin}>
 
-            <div>
-                <label>Password</label>
+                <div className="auth-field">
+                    <label>Email</label>
 
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
-                    required
-                />
-            </div>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
+                        placeholder="you@example.com"
+                        required
+                    />
+                </div>
 
-            {error && (
-                <p>{error}</p>
-            )}
+                <div className="auth-field">
+                    <label>Password</label>
 
-            <button type="submit">
-                Login
-            </button>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
+                        placeholder="••••••••"
+                        required
+                    />
+                </div>
 
-        </form>
+                {error && (
+                    <p className="auth-error">{error}</p>
+                )}
 
-        <p>
-            Don't have an account?
-            <button
-                type="button"
-                onClick={() => navigate("/register")}
-            >
-                Register
-            </button>
-        </p>
+                <button className="auth-submit" type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <p className="auth-footer">
+                Don't have an account?
+                <button
+                    type="button"
+                    className="auth-link-button"
+                    onClick={() => navigate("/register")}
+                >
+                    Register
+                </button>
+            </p>
+
+        </div>
 
     </div>
 );

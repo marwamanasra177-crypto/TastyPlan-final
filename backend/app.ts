@@ -7,6 +7,8 @@ import { engine } from "express-handlebars";
 import path from "path";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import favoritesRoutes from "./routes/favoritesRoutes.js";
+import mealPlanRoutes from "./routes/mealPlanRoutes.js";
 
 const app = express();
 
@@ -85,6 +87,16 @@ app.use(
 app.use(
     "/api/auth",
     authRoutes
+);
+
+app.use(
+    "/api/favorites",
+    favoritesRoutes
+);
+
+app.use(
+    "/api/mealplan",
+    mealPlanRoutes
 );
 
 AppDataSource.initialize()

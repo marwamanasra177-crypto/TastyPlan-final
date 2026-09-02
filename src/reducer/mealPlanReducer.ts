@@ -31,6 +31,11 @@ export type MealPlanAction =
     |
     {
         type: "CLEAR_WEEK";
+    }
+    |
+    {
+        type: "SET_PLAN";
+        payload: MealPlanState;
     };
 
 export function mealPlanReducer(
@@ -60,6 +65,8 @@ export function mealPlanReducer(
             };
         case "CLEAR_WEEK":
             return initialMealPlan;
+        case "SET_PLAN":
+            return action.payload;
         default:
             return state;
     }
