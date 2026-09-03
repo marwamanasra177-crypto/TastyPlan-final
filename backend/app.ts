@@ -2,7 +2,7 @@ import express from "express";
 import mealRoutes from "./routes/mealRoutes.js";
 import dataRoutes from "./routes/dataRoutes.js";
 import cors from "cors";
-import { AppDataSource } from "./data-source.js";
+import { connectDB } from "./db/mongoose.js";
 import { engine } from "express-handlebars";
 import path from "path";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
@@ -99,12 +99,8 @@ app.use(
     mealPlanRoutes
 );
 
-AppDataSource.initialize()
+connectDB()
     .then(() => {
-
-        console.log(
-            "Database connected successfully"
-        );
 
         app.listen(PORT, () => {
 

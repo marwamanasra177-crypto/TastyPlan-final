@@ -25,7 +25,7 @@ export type MealPlanAction =
         type: "REMOVE_MEAL";
         payload: {
             day: Day;
-            id: number;
+            id: string;
         }
     }
     |

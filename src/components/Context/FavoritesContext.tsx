@@ -14,7 +14,7 @@ const FAVORITES_URL = "http://localhost:5000/api/favorites";
 interface FavoritesContextType {
     favorites: Meal[];
     toggleFavorite: (meal: Meal) => void;
-    isFavorite: (id: number) => boolean;
+    isFavorite: (id: string) => boolean;
     loading: boolean;
 }
 
@@ -159,7 +159,7 @@ export function FavoritesProvider(
         sync();
     };
 
-    const isFavorite = (id: number) => {
+    const isFavorite = (id: string) => {
         return favorites.some(
             (item) => item.id === id
         );

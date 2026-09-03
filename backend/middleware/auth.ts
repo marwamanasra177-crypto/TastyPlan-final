@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 export interface AuthedRequest extends Request {
-    userId?: number;
+    userId?: string;
     userRole?: "user" | "admin";
 }
 
@@ -53,7 +53,7 @@ export function requireAuth(
         }
 
         const decoded = jwt.verify(token, secret) as {
-            id: number;
+            id: string;
             role: "user" | "admin";
         };
 

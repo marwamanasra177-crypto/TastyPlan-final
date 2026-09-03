@@ -17,7 +17,7 @@ export const areas = () =>
 export const ingredients = () =>
     `${BASE_URL}/ingredients`;
 
-export const mealDetails = (id: number) =>
+export const mealDetails = (id: string) =>
     `${BASE_URL}/meals/${id}`;
 
 export const filterByCategory = (category: string) =>

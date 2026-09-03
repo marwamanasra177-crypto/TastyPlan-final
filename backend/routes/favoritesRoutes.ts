@@ -1,15 +1,10 @@
 import { Router } from "express";
-import { AppDataSource } from "../data-source.js";
-import { Favorite } from "../entities/Favorite.js";
-import { Meal } from "../entities/Meal.js";
-import { User } from "../entities/User.js";
+import { Favorite } from "../models/Favorite.js";
+import { Meal } from "../models/Meal.js";
 import { requireAuth } from "../middleware/auth.js";
 import type { AuthedRequest } from "../middleware/auth.js";
 
 const router = Router();
-
-const favoriteRepository = AppDataSource.getRepository(Favorite);
-const mealRepository = AppDataSource.getRepository(Meal);
 
 /*
 |--------------------------------------------------------------------------
@@ -21,20 +16,17 @@ router.get("/", requireAuth, async (req: AuthedRequest, res) => {
 
     try {
 
-        const favorites = await favoriteRepository.find({
-            where: {
-                user: { id: req.userId! },
-            },
-            relations: {
-                meal: {
-                    category: true,
-                    area: true,
-                },
-            },
-            order: {
-                createdAt: "DESC",
-            },
-        });
+        const favorites = await Favorite.find({
+            user: req.userId,
+        })
+            .populate({
+                path: "meal",
+                populate: [
+                    { path: "category" },
+                    { path: "area" },
+                ],
+            })
+            .sort({ createdAt: -1 });
 
         return res.json({
             meals: favorites.map((favorite) => favorite.meal),
@@ -68,9 +60,7 @@ router.post("/", requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        const meal = await mealRepository.findOne({
-            where: { id: Number(mealId) },
-        });
+        const meal = await Meal.findById(mealId);
 
         if (!meal) {
             return res.status(404).json({
@@ -78,11 +68,9 @@ router.post("/", requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        const existing = await favoriteRepository.findOne({
-            where: {
-                user: { id: req.userId! },
-                meal: { id: meal.id },
-            },
+        const existing = await Favorite.findOne({
+            user: req.userId,
+            meal: meal._id,
         });
 
         if (existing) {
@@ -91,12 +79,10 @@ router.post("/", requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        const favorite = favoriteRepository.create({
-            user: { id: req.userId! } as User,
-            meal,
+        await Favorite.create({
+            user: req.userId,
+            meal: meal._id,
         });
-
-        await favoriteRepository.save(favorite);
 
         return res.status(201).json({
             message: "Added to favorites",
@@ -125,11 +111,9 @@ router.delete(
 
         try {
 
-            const mealId = Number(req.params.mealId);
-
-            await favoriteRepository.delete({
-                user: { id: req.userId! } as User,
-                meal: { id: mealId } as Meal,
+            await Favorite.deleteOne({
+                user: req.userId,
+                meal: req.params.mealId,
             });
 
             return res.json({

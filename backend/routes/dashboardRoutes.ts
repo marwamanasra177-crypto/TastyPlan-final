@@ -1,39 +1,28 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Category } from "../entities/Category.js";
-import { AppDataSource } from "../data-source.js";
-import { User } from "../entities/User.js";
+
+import { User } from "../models/User.js";
+import { Category } from "../models/Category.js";
+import { Area } from "../models/Area.js";
+import { Ingredient } from "../models/Ingredient.js";
+import { Meal } from "../models/Meal.js";
+import { Favorite } from "../models/Favorite.js";
+import { MealPlan } from "../models/MealPlan.js";
 import { requireAdmin } from "../middleware/dashboardAuth.js";
-import { Area } from "../entities/Area.js";
-import { Ingredient } from "../entities/Ingredient.js";
-import { Meal } from "../entities/Meal.js";
-import { MealIngredient } from "../entities/MealIngredient.js";
-import { Favorite } from "../entities/Favorite.js";
-import { MealPlan } from "../entities/MealPlan.js";
+
 const router = Router();
 
-const favoriteRepository =
-    AppDataSource.getRepository(Favorite);
+const DAYS = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 
-const mealPlanRepository =
-    AppDataSource.getRepository(MealPlan);
-
-const userRepository = AppDataSource.getRepository(User);
-
-const mealRepository = AppDataSource.getRepository(Meal);
-
-const categoryRepository =
-    AppDataSource.getRepository(Category);
-
-const areaRepository =
-    AppDataSource.getRepository(Area);
-
-const ingredientRepository =
-    AppDataSource.getRepository(Ingredient);
-
-const mealIngredientRepository =
-    AppDataSource.getRepository(MealIngredient);
 /*
 |--------------------------------------------------------------------------
 | Login Page
@@ -72,9 +61,7 @@ router.post("/login", async (req, res) => {
 
         }
 
-        const user = await userRepository.findOne({
-            where: { email },
-        });
+        const user = await User.findOne({ email });
 
         if (!user) {
 
@@ -120,18 +107,17 @@ router.post("/login", async (req, res) => {
         }
 
         const token = jwt.sign(
-    {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-    },
-    secret,
-    {
-        expiresIn: "1h",
-    }
-);
-
+            {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            secret,
+            {
+                expiresIn: "1h",
+            }
+        );
 
         res.setHeader(
             "Set-Cookie",
@@ -163,7 +149,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/", requireAdmin, async (req, res) => {
 
-    const usersCount = await userRepository.count();
+    const usersCount = await User.countDocuments();
 
     res.render("dashboard", {
         title: "Dashboard",
@@ -183,18 +169,9 @@ router.get("/users", requireAdmin, async (req, res) => {
 
     try {
 
-        const users = await userRepository.find({
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                createdAt: true,
-            },
-            order: {
-                createdAt: "DESC",
-            },
-        });
+        const users = await User.find()
+            .select("name email role createdAt")
+            .sort({ createdAt: -1 });
 
         res.render("users", {
             title: "Users",
@@ -290,10 +267,7 @@ router.post("/users", requireAdmin, async (req, res) => {
         }
 
 
-        const existingUser =
-            await userRepository.findOne({
-                where: { email },
-            });
+        const existingUser = await User.findOne({ email });
 
 
         if (existingUser) {
@@ -326,24 +300,15 @@ router.post("/users", requireAdmin, async (req, res) => {
         }
 
 
-        const hashedPassword =
-            await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
 
-        const user = userRepository.create({
-
+        await User.create({
             name,
-
             email,
-
             password: hashedPassword,
-
             role,
-
         });
-
-
-        await userRepository.save(user);
 
 
         res.redirect("/dashboard/users");
@@ -369,56 +334,24 @@ router.get("/users/:id", requireAdmin, async (req, res) => {
 
     try {
 
-        const id = Number(req.params.id);
-
-        const user = await userRepository.findOne({
-            where: { id },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                createdAt: true,
-            },
-        });
+        const user = await User.findById(req.params.id)
+            .select("name email role createdAt");
 
         if (!user) {
             return res.status(404).send("User not found");
         }
 
-        const favorites = await favoriteRepository.find({
-            where: {
-                user: { id },
-            },
-            relations: {
-                meal: true,
-            },
-            order: {
-                createdAt: "DESC",
-            },
-        });
+        const favorites = await Favorite.find({
+            user: user._id,
+        })
+            .populate("meal")
+            .sort({ createdAt: -1 });
 
-        const planEntries = await mealPlanRepository.find({
-            where: {
-                user: { id },
-            },
-            relations: {
-                meal: true,
-            },
-            order: {
-                createdAt: "ASC",
-            },
-        });
-
-        const DAYS = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        ];
+        const planEntries = await MealPlan.find({
+            user: user._id,
+        })
+            .populate("meal")
+            .sort({ createdAt: 1 });
 
         const mealPlanByDay = DAYS.map((day) => ({
             day,
@@ -455,11 +388,7 @@ router.get("/users/:id/edit", requireAdmin, async (req, res) => {
 
     try {
 
-        const id = Number(req.params.id);
-
-        const user = await userRepository.findOne({
-            where: { id },
-        });
+        const user = await User.findById(req.params.id);
 
         if (!user) {
             return res.status(404).send("User not found");
@@ -494,13 +423,9 @@ router.post("/users/:id/edit", requireAdmin, async (req, res) => {
 
     try {
 
-        const id = Number(req.params.id);
-
         const { name, email, password, role } = req.body;
 
-        const user = await userRepository.findOne({
-            where: { id },
-        });
+        const user = await User.findById(req.params.id);
 
         if (!user) {
             return res.status(404).send("User not found");
@@ -515,7 +440,7 @@ router.post("/users/:id/edit", requireAdmin, async (req, res) => {
             user.password = await bcrypt.hash(password, 10);
         }
 
-        await userRepository.save(user);
+        await user.save();
 
         res.redirect("/dashboard/users");
 
@@ -540,7 +465,7 @@ router.post("/users/:id/delete", requireAdmin, async (req, res) => {
 
     try {
 
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         // Prevent admin from deleting themselves
         if (id === res.locals.admin.id) {
@@ -549,15 +474,13 @@ router.post("/users/:id/delete", requireAdmin, async (req, res) => {
             );
         }
 
-        const user = await userRepository.findOne({
-            where: { id },
-        });
+        const user = await User.findById(id);
 
         if (!user) {
             return res.status(404).send("User not found");
         }
 
-        await userRepository.remove(user);
+        await user.deleteOne();
 
         res.redirect("/dashboard/users");
 
@@ -583,14 +506,7 @@ router.get("/categories", requireAdmin, async (req, res) => {
 
     try {
 
-        const categoryRepository =
-            AppDataSource.getRepository(Category);
-
-        const categories = await categoryRepository.find({
-            order: {
-                id: "ASC",
-            },
-        });
+        const categories = await Category.find().sort({ name: 1 });
 
         res.render("categories", {
             title: "Categories",
@@ -634,25 +550,17 @@ router.post("/categories", requireAdmin, async (req, res) => {
             return res.status(400).send("Category name is required");
         }
 
-        const categoryRepository =
-            AppDataSource.getRepository(Category);
-
-        const existingCategory =
-            await categoryRepository.findOne({
-                where: { name },
-            });
+        const existingCategory = await Category.findOne({ name });
 
         if (existingCategory) {
             return res.status(409).send("Category already exists");
         }
 
-        const category = categoryRepository.create({
+        await Category.create({
             name,
             image: image || null,
             description: description || null,
         });
-
-        await categoryRepository.save(category);
 
         res.redirect("/dashboard/categories");
 
@@ -676,15 +584,7 @@ router.get(
 
         try {
 
-            const id = Number(req.params.id);
-
-            const categoryRepository =
-                AppDataSource.getRepository(Category);
-
-            const category =
-                await categoryRepository.findOne({
-                    where: { id },
-                });
+            const category = await Category.findById(req.params.id);
 
             if (!category) {
                 return res.status(404).send("Category not found");
@@ -718,8 +618,6 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
             const { name, image, description } = req.body;
 
             if (!name) {
@@ -728,13 +626,7 @@ router.post(
                 );
             }
 
-            const categoryRepository =
-                AppDataSource.getRepository(Category);
-
-            const category =
-                await categoryRepository.findOne({
-                    where: { id },
-                });
+            const category = await Category.findById(req.params.id);
 
             if (!category) {
                 return res.status(404).send("Category not found");
@@ -744,7 +636,7 @@ router.post(
             category.image = image || null;
             category.description = description || null;
 
-            await categoryRepository.save(category);
+            await category.save();
 
             res.redirect("/dashboard/categories");
 
@@ -769,21 +661,13 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
-            const categoryRepository =
-                AppDataSource.getRepository(Category);
-
-            const category =
-                await categoryRepository.findOne({
-                    where: { id },
-                });
+            const category = await Category.findById(req.params.id);
 
             if (!category) {
                 return res.status(404).send("Category not found");
             }
 
-            await categoryRepository.remove(category);
+            await category.deleteOne();
 
             res.redirect("/dashboard/categories");
 
@@ -810,14 +694,7 @@ router.get("/areas", requireAdmin, async (req, res) => {
 
     try {
 
-        const areaRepository =
-            AppDataSource.getRepository(Area);
-
-        const areas = await areaRepository.find({
-            order: {
-                id: "ASC",
-            },
-        });
+        const areas = await Area.find().sort({ name: 1 });
 
         res.render("areas", {
             title: "Areas",
@@ -861,23 +738,13 @@ router.post("/areas", requireAdmin, async (req, res) => {
             return res.status(400).send("Area name is required");
         }
 
-        const areaRepository =
-            AppDataSource.getRepository(Area);
-
-        const existingArea =
-            await areaRepository.findOne({
-                where: { name },
-            });
+        const existingArea = await Area.findOne({ name });
 
         if (existingArea) {
             return res.status(409).send("Area already exists");
         }
 
-        const area = areaRepository.create({
-            name,
-        });
-
-        await areaRepository.save(area);
+        await Area.create({ name });
 
         res.redirect("/dashboard/areas");
 
@@ -901,15 +768,7 @@ router.get(
 
         try {
 
-            const id = Number(req.params.id);
-
-            const areaRepository =
-                AppDataSource.getRepository(Area);
-
-            const area =
-                await areaRepository.findOne({
-                    where: { id },
-                });
+            const area = await Area.findById(req.params.id);
 
             if (!area) {
                 return res.status(404).send("Area not found");
@@ -943,21 +802,13 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
             const { name } = req.body;
 
             if (!name) {
                 return res.status(400).send("Area name is required");
             }
 
-            const areaRepository =
-                AppDataSource.getRepository(Area);
-
-            const area =
-                await areaRepository.findOne({
-                    where: { id },
-                });
+            const area = await Area.findById(req.params.id);
 
             if (!area) {
                 return res.status(404).send("Area not found");
@@ -965,7 +816,7 @@ router.post(
 
             area.name = name;
 
-            await areaRepository.save(area);
+            await area.save();
 
             res.redirect("/dashboard/areas");
 
@@ -990,21 +841,13 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
-            const areaRepository =
-                AppDataSource.getRepository(Area);
-
-            const area =
-                await areaRepository.findOne({
-                    where: { id },
-                });
+            const area = await Area.findById(req.params.id);
 
             if (!area) {
                 return res.status(404).send("Area not found");
             }
 
-            await areaRepository.remove(area);
+            await area.deleteOne();
 
             res.redirect("/dashboard/areas");
 
@@ -1030,14 +873,7 @@ router.get("/ingredients", requireAdmin, async (req, res) => {
 
     try {
 
-        const ingredientRepository =
-            AppDataSource.getRepository(Ingredient);
-
-        const ingredients = await ingredientRepository.find({
-            order: {
-                id: "ASC",
-            },
-        });
+        const ingredients = await Ingredient.find().sort({ name: 1 });
 
         res.render("ingredients", {
             title: "Ingredients",
@@ -1083,13 +919,7 @@ router.post("/ingredients", requireAdmin, async (req, res) => {
             );
         }
 
-        const ingredientRepository =
-            AppDataSource.getRepository(Ingredient);
-
-        const existingIngredient =
-            await ingredientRepository.findOne({
-                where: { name },
-            });
+        const existingIngredient = await Ingredient.findOne({ name });
 
         if (existingIngredient) {
             return res.status(409).send(
@@ -1097,12 +927,7 @@ router.post("/ingredients", requireAdmin, async (req, res) => {
             );
         }
 
-        const ingredient =
-            ingredientRepository.create({
-                name,
-            });
-
-        await ingredientRepository.save(ingredient);
+        await Ingredient.create({ name });
 
         res.redirect("/dashboard/ingredients");
 
@@ -1128,20 +953,10 @@ router.get(
 
         try {
 
-            const id = Number(req.params.id);
-
-            const ingredientRepository =
-                AppDataSource.getRepository(Ingredient);
-
-            const ingredient =
-                await ingredientRepository.findOne({
-                    where: { id },
-                });
+            const ingredient = await Ingredient.findById(req.params.id);
 
             if (!ingredient) {
-                return res.status(404).send(
-                    "Ingredient not found"
-                );
+                return res.status(404).send("Ingredient not found");
             }
 
             res.render("ingredient-form", {
@@ -1155,9 +970,7 @@ router.get(
 
             console.error(error);
 
-            res.status(500).send(
-                "Failed to load ingredient"
-            );
+            res.status(500).send("Failed to load ingredient");
 
         }
 
@@ -1174,8 +987,6 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
             const { name } = req.body;
 
             if (!name) {
@@ -1184,23 +995,15 @@ router.post(
                 );
             }
 
-            const ingredientRepository =
-                AppDataSource.getRepository(Ingredient);
-
-            const ingredient =
-                await ingredientRepository.findOne({
-                    where: { id },
-                });
+            const ingredient = await Ingredient.findById(req.params.id);
 
             if (!ingredient) {
-                return res.status(404).send(
-                    "Ingredient not found"
-                );
+                return res.status(404).send("Ingredient not found");
             }
 
             ingredient.name = name;
 
-            await ingredientRepository.save(ingredient);
+            await ingredient.save();
 
             res.redirect("/dashboard/ingredients");
 
@@ -1208,9 +1011,7 @@ router.post(
 
             console.error(error);
 
-            res.status(500).send(
-                "Failed to update ingredient"
-            );
+            res.status(500).send("Failed to update ingredient");
 
         }
 
@@ -1227,23 +1028,13 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
-            const ingredientRepository =
-                AppDataSource.getRepository(Ingredient);
-
-            const ingredient =
-                await ingredientRepository.findOne({
-                    where: { id },
-                });
+            const ingredient = await Ingredient.findById(req.params.id);
 
             if (!ingredient) {
-                return res.status(404).send(
-                    "Ingredient not found"
-                );
+                return res.status(404).send("Ingredient not found");
             }
 
-            await ingredientRepository.remove(ingredient);
+            await ingredient.deleteOne();
 
             res.redirect("/dashboard/ingredients");
 
@@ -1251,9 +1042,7 @@ router.post(
 
             console.error(error);
 
-            res.status(500).send(
-                "Failed to delete ingredient"
-            );
+            res.status(500).send("Failed to delete ingredient");
 
         }
 
@@ -1266,21 +1055,14 @@ router.post(
 |--------------------------------------------------------------------------
 */
 
-// Meals List
-
 router.get("/meals", requireAdmin, async (req, res) => {
 
     try {
 
-        const meals = await mealRepository.find({
-            relations: {
-                category: true,
-                area: true,
-            },
-            order: {
-                id: "ASC",
-            },
-        });
+        const meals = await Meal.find()
+            .populate("category")
+            .populate("area")
+            .sort({ name: 1 });
 
         res.render("meals", {
             title: "Meals",
@@ -1301,23 +1083,9 @@ router.get("/meals/new", requireAdmin, async (req, res) => {
 
     try {
 
-        const categories = await categoryRepository.find({
-            order: {
-                name: "ASC",
-            },
-        });
-
-        const areas = await areaRepository.find({
-            order: {
-                name: "ASC",
-            },
-        });
-
-        const ingredients = await ingredientRepository.find({
-            order: {
-                name: "ASC",
-            },
-        });
+        const categories = await Category.find().sort({ name: 1 });
+        const areas = await Area.find().sort({ name: 1 });
+        const ingredients = await Ingredient.find().sort({ name: 1 });
 
         res.render("meal-form", {
             title: "Add Meal",
@@ -1372,11 +1140,7 @@ router.post("/meals", requireAdmin, async (req, res) => {
 
         // Check if TheMealDB ID already exists
 
-        const existingMeal = await mealRepository.findOne({
-            where: {
-                themealdbId,
-            },
-        });
+        const existingMeal = await Meal.findOne({ themealdbId });
 
 
         if (existingMeal) {
@@ -1394,11 +1158,7 @@ router.post("/meals", requireAdmin, async (req, res) => {
 
         if (categoryId) {
 
-            category = await categoryRepository.findOne({
-                where: {
-                    id: Number(categoryId),
-                },
-            });
+            category = await Category.findById(categoryId);
 
             if (!category) {
 
@@ -1417,11 +1177,7 @@ router.post("/meals", requireAdmin, async (req, res) => {
 
         if (areaId) {
 
-            area = await areaRepository.findOne({
-                where: {
-                    id: Number(areaId),
-                },
-            });
+            area = await Area.findById(areaId);
 
             if (!area) {
 
@@ -1434,9 +1190,44 @@ router.post("/meals", requireAdmin, async (req, res) => {
         }
 
 
+        // Build ingredients array
+
+        const mealIngredients: {
+            ingredient: string;
+            measure: string | null;
+        }[] = [];
+
+        if (ingredientIds) {
+
+            const ids = Array.isArray(ingredientIds)
+                ? ingredientIds
+                : [ingredientIds];
+
+
+            for (const ingredientId of ids) {
+
+                const ingredient = await Ingredient.findById(ingredientId);
+
+                if (!ingredient) {
+                    continue;
+                }
+
+                const measure =
+                    req.body[`measure_${ingredientId}`] || null;
+
+                mealIngredients.push({
+                    ingredient: ingredient.id,
+                    measure,
+                });
+
+            }
+
+        }
+
+
         // Create Meal
 
-        const meal = mealRepository.create({
+        await Meal.create({
 
             name,
 
@@ -1448,63 +1239,13 @@ router.post("/meals", requireAdmin, async (req, res) => {
 
             instructions: instructions || null,
 
-            category,
+            category: category ? category._id : null,
 
-            area,
+            area: area ? area._id : null,
+
+            mealIngredients,
 
         });
-
-
-        await mealRepository.save(meal);
-
-
-        // Add Ingredients
-
-        if (ingredientIds) {
-
-            const ids = Array.isArray(ingredientIds)
-                ? ingredientIds
-                : [ingredientIds];
-
-
-            for (const ingredientId of ids) {
-
-                const ingredient =
-                    await ingredientRepository.findOne({
-                        where: {
-                            id: Number(ingredientId),
-                        },
-                    });
-
-
-                if (!ingredient) {
-                    continue;
-                }
-
-
-                const measure =
-                    req.body[`measure_${ingredientId}`] || null;
-
-
-                const mealIngredient =
-                    mealIngredientRepository.create({
-
-                        meal,
-
-                        ingredient,
-
-                        measure,
-
-                    });
-
-
-                await mealIngredientRepository.save(
-                    mealIngredient
-                );
-
-            }
-
-        }
 
 
         // Redirect to Meals page
@@ -1533,20 +1274,10 @@ router.get("/meals/:id/edit", requireAdmin, async (req, res) => {
 
     try {
 
-        const id = Number(req.params.id);
-
-        const meal = await mealRepository.findOne({
-            where: {
-                id,
-            },
-            relations: {
-                category: true,
-                area: true,
-                mealIngredients: {
-                    ingredient: true,
-                },
-            },
-        });
+        const meal = await Meal.findById(req.params.id)
+            .populate("category")
+            .populate("area")
+            .populate("mealIngredients.ingredient");
 
 
         if (!meal) {
@@ -1558,55 +1289,38 @@ router.get("/meals/:id/edit", requireAdmin, async (req, res) => {
         }
 
 
-        const categories = await categoryRepository.find({
-            order: {
-                name: "ASC",
-            },
-        });
-
-
-        const areas = await areaRepository.find({
-            order: {
-                name: "ASC",
-            },
-        });
-
-
-        const ingredients = await ingredientRepository.find({
-            order: {
-                name: "ASC",
-            },
-        });
+        const categories = await Category.find().sort({ name: 1 });
+        const areas = await Area.find().sort({ name: 1 });
+        const ingredients = await Ingredient.find().sort({ name: 1 });
 
 
         // Prepare ingredients with their measures
 
-        const mealIngredientsMap =
-            new Map<number, string | null>();
-
+        const mealIngredientsMap = new Map<string, string | null>();
 
         for (const mealIngredient of meal.mealIngredients) {
 
+            const ingredientDoc: any = mealIngredient.ingredient;
+
             mealIngredientsMap.set(
-                mealIngredient.ingredient.id,
+                ingredientDoc.id,
                 mealIngredient.measure
             );
 
         }
 
 
-        const ingredientsWithData =
-            ingredients.map((ingredient) => ({
+        const ingredientsWithData = ingredients.map((ingredient) => ({
 
-                ...ingredient,
+            id: ingredient.id,
 
-                selected:
-                    mealIngredientsMap.has(ingredient.id),
+            name: ingredient.name,
 
-                measure:
-                    mealIngredientsMap.get(ingredient.id) || "",
+            selected: mealIngredientsMap.has(ingredient.id),
 
-            }));
+            measure: mealIngredientsMap.get(ingredient.id) || "",
+
+        }));
 
 
         res.render("meal-form", {
@@ -1653,8 +1367,6 @@ router.post(
 
         try {
 
-            const id = Number(req.params.id);
-
             const {
                 name,
                 themealdbId,
@@ -1669,10 +1381,7 @@ router.post(
 
             // Find meal
 
-            const meal =
-                await mealRepository.findOne({
-                    where: { id },
-                });
+            const meal = await Meal.findById(req.params.id);
 
 
             if (!meal) {
@@ -1697,17 +1406,12 @@ router.post(
 
             // Check duplicate TheMealDB ID
 
-            const existingMeal =
-                await mealRepository.findOne({
-                    where: {
-                        themealdbId,
-                    },
-                });
+            const existingMeal = await Meal.findOne({ themealdbId });
 
 
             if (
                 existingMeal &&
-                existingMeal.id !== meal.id
+                String(existingMeal._id) !== String(meal._id)
             ) {
 
                 return res.status(409).send(
@@ -1723,12 +1427,7 @@ router.post(
 
             if (categoryId) {
 
-                category =
-                    await categoryRepository.findOne({
-                        where: {
-                            id: Number(categoryId),
-                        },
-                    });
+                category = await Category.findById(categoryId);
 
 
                 if (!category) {
@@ -1748,12 +1447,7 @@ router.post(
 
             if (areaId) {
 
-                area =
-                    await areaRepository.findOne({
-                        where: {
-                            id: Number(areaId),
-                        },
-                    });
+                area = await Area.findById(areaId);
 
 
                 if (!area) {
@@ -1773,84 +1467,59 @@ router.post(
 
             meal.themealdbId = themealdbId;
 
-            meal.image =
-                image || null;
+            meal.image = image || null;
 
-            meal.youtubeUrl =
-                youtubeUrl || null;
+            meal.youtubeUrl = youtubeUrl || null;
 
-            meal.instructions =
-                instructions || null;
+            meal.instructions = instructions || null;
 
-            meal.category =
-                category;
+            meal.category = category ? (category._id as any) : null;
 
-            meal.area =
-                area;
+            meal.area = area ? (area._id as any) : null;
 
 
-            await mealRepository.save(meal);
+            // Rebuild ingredients
 
-
-            // Remove old ingredients
-
-            await mealIngredientRepository.delete({
-                meal: {
-                    id: meal.id,
-                },
-            });
-
-
-            // Add updated ingredients
+            const mealIngredients: {
+                ingredient: string;
+                measure: string | null;
+            }[] = [];
 
             if (ingredientIds) {
 
-                const ids =
-                    Array.isArray(ingredientIds)
-                        ? ingredientIds
-                        : [ingredientIds];
+                const ids = Array.isArray(ingredientIds)
+                    ? ingredientIds
+                    : [ingredientIds];
 
 
                 for (const ingredientId of ids) {
 
-                    const ingredient =
-                        await ingredientRepository.findOne({
-                            where: {
-                                id: Number(ingredientId),
-                            },
-                        });
-
+                    const ingredient = await Ingredient.findById(
+                        ingredientId
+                    );
 
                     if (!ingredient) {
                         continue;
                     }
-
 
                     const measure =
                         req.body[
                             `measure_${ingredientId}`
                         ] || null;
 
-
-                    const mealIngredient =
-                        mealIngredientRepository.create({
-
-                            meal,
-
-                            ingredient,
-
-                            measure,
-
-                        });
-
-
-                    await mealIngredientRepository.save(
-                        mealIngredient
-                    );
+                    mealIngredients.push({
+                        ingredient: ingredient.id,
+                        measure,
+                    });
 
                 }
 
             }
+
+            meal.mealIngredients = mealIngredients as any;
+
+
+            await meal.save();
 
 
             res.redirect("/dashboard/meals");
@@ -1881,14 +1550,7 @@ router.post(
 
         try {
 
-            const id =
-                Number(req.params.id);
-
-
-            const meal =
-                await mealRepository.findOne({
-                    where: { id },
-                });
+            const meal = await Meal.findById(req.params.id);
 
 
             if (!meal) {
@@ -1900,18 +1562,7 @@ router.post(
             }
 
 
-            // Delete related meal ingredients first
-
-            await mealIngredientRepository.delete({
-                meal: {
-                    id: meal.id,
-                },
-            });
-
-
-            // Delete meal
-
-            await mealRepository.remove(meal);
+            await meal.deleteOne();
 
 
             res.redirect(
@@ -1948,6 +1599,5 @@ router.get("/logout", (req, res) => {
     res.redirect("/dashboard/login");
 
 });
-
 
 export default router;

@@ -1,15 +1,10 @@
 import { Router } from "express";
-import { AppDataSource } from "../data-source.js";
-import { MealPlan } from "../entities/MealPlan.js";
-import { Meal } from "../entities/Meal.js";
-import { User } from "../entities/User.js";
+import { MealPlan } from "../models/MealPlan.js";
+import { Meal } from "../models/Meal.js";
 import { requireAuth } from "../middleware/auth.js";
 import type { AuthedRequest } from "../middleware/auth.js";
 
 const router = Router();
-
-const planRepository = AppDataSource.getRepository(MealPlan);
-const mealRepository = AppDataSource.getRepository(Meal);
 
 const DAYS = [
     "Sunday",
@@ -31,20 +26,17 @@ router.get("/", requireAuth, async (req: AuthedRequest, res) => {
 
     try {
 
-        const entries = await planRepository.find({
-            where: {
-                user: { id: req.userId! },
-            },
-            relations: {
-                meal: {
-                    category: true,
-                    area: true,
-                },
-            },
-            order: {
-                createdAt: "ASC",
-            },
-        });
+        const entries = await MealPlan.find({
+            user: req.userId,
+        })
+            .populate({
+                path: "meal",
+                populate: [
+                    { path: "category" },
+                    { path: "area" },
+                ],
+            })
+            .sort({ createdAt: 1 });
 
         const plan: Record<string, unknown[]> = {};
 
@@ -91,9 +83,7 @@ router.post("/", requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        const meal = await mealRepository.findOne({
-            where: { id: Number(mealId) },
-        });
+        const meal = await Meal.findById(mealId);
 
         if (!meal) {
             return res.status(404).json({
@@ -101,13 +91,11 @@ router.post("/", requireAuth, async (req: AuthedRequest, res) => {
             });
         }
 
-        const entry = planRepository.create({
-            user: { id: req.userId! } as User,
+        await MealPlan.create({
+            user: req.userId,
             day,
-            meal,
+            meal: meal._id,
         });
-
-        await planRepository.save(entry);
 
         return res.status(201).json({
             message: "Meal added to plan",
@@ -136,13 +124,10 @@ router.delete(
 
         try {
 
-            const day = req.params.day as string;
-            const mealId = Number(req.params.mealId);
-
-            await planRepository.delete({
-                user: { id: req.userId! } as User,
-                day,
-                meal: { id: mealId } as Meal,
+            await MealPlan.deleteOne({
+                user: req.userId,
+                day: req.params.day,
+                meal: req.params.mealId,
             });
 
             return res.json({
@@ -170,8 +155,8 @@ router.delete("/", requireAuth, async (req: AuthedRequest, res) => {
 
     try {
 
-        await planRepository.delete({
-            user: { id: req.userId! } as User,
+        await MealPlan.deleteMany({
+            user: req.userId,
         });
 
         return res.json({

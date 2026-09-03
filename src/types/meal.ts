@@ -1,26 +1,26 @@
 export interface Category {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface Area {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface Ingredient {
-    id: number;
+    id: string;
     name: string;
 }
 
 export interface MealIngredient {
-    id: number;
+    id: string;
     measure: string | null;
     ingredient: Ingredient;
 }
 
 export interface Meal {
-    id: number;
+    id: string;
     themealdbId: string;
     name: string;
     instructions: string | null;

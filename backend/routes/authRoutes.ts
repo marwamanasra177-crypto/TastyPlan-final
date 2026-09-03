@@ -2,12 +2,10 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import { AppDataSource } from "../data-source.js";
-import { User } from "../entities/User.js";
+import { User } from "../models/User.js";
 
 const router = Router();
 
-const userRepository = AppDataSource.getRepository(User);
 router.post("/register", async (req, res) => {
 
     try {
@@ -20,9 +18,7 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        const existingUser = await userRepository.findOne({
-            where: { email },
-        });
+        const existingUser = await User.findOne({ email });
 
         if (existingUser) {
             return res.status(409).json({
@@ -32,14 +28,12 @@ router.post("/register", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = userRepository.create({
+        const user = await User.create({
             name,
             email,
             password: hashedPassword,
             role: "user",
         });
-
-        await userRepository.save(user);
 
         res.status(201).json({
             message: "Registration successful",
@@ -73,9 +67,7 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        const user = await userRepository.findOne({
-            where: { email },
-        });
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(401).json({
@@ -187,16 +179,12 @@ router.get("/me", async (req, res) => {
         }
 
         const decoded = jwt.verify(token, secret) as {
-            id: number;
+            id: string;
             email: string;
             role: "user" | "admin";
         };
 
-        const user = await userRepository.findOne({
-            where: {
-                id: decoded.id,
-            },
-        });
+        const user = await User.findById(decoded.id);
 
         if (!user) {
             return res.status(401).json({

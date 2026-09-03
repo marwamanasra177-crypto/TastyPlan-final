@@ -8,7 +8,7 @@ import {
 const AUTH_BASE_URL = "http://localhost:5000/api/auth";
 
 export interface AuthUser {
-    id: number;
+    id: string;
     name: string;
     email: string;
     role: "user" | "admin";

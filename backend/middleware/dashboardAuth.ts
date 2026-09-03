@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 interface AuthPayload {
-    id: number;
+    id: string;
     name: string;
     email: string;
     role: "user" | "admin";

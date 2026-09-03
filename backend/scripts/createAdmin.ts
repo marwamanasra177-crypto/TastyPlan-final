@@ -1,47 +1,40 @@
 import "dotenv/config";
 import bcrypt from "bcrypt";
 
-import { AppDataSource } from "../data-source.js";
-import { User } from "../entities/User.js";
+import { connectDB } from "../db/mongoose.js";
+import { User } from "../models/User.js";
+import mongoose from "mongoose";
 
 const createAdmin = async () => {
 
-    await AppDataSource.initialize();
-
-    const userRepository =
-        AppDataSource.getRepository(User);
+    await connectDB();
 
     const email = "admin@tastyplan.com";
     const password = "admin123";
     const name = "TastyPlan Admin";
 
-    const existingAdmin =
-        await userRepository.findOne({
-            where: { email },
-        });
+    const existingAdmin = await User.findOne({ email });
 
     if (existingAdmin) {
         console.log("Admin already exists");
+        await mongoose.disconnect();
         process.exit(0);
     }
 
-    const hashedPassword =
-        await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const admin = userRepository.create({
+    await User.create({
         name,
         email,
         password: hashedPassword,
         role: "admin",
     });
 
-    await userRepository.save(admin);
-
     console.log("Admin created successfully");
     console.log("Email:", email);
     console.log("Password:", password);
 
-    await AppDataSource.destroy();
+    await mongoose.disconnect();
 };
 
 createAdmin();

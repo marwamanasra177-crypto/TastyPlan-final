@@ -1,21 +1,10 @@
 import { Router } from "express";
 
-import { AppDataSource } from "../data-source.js";
-
-import { Category } from "../entities/Category.js";
-import { Area } from "../entities/Area.js";
-import { Ingredient } from "../entities/Ingredient.js";
+import { Category } from "../models/Category.js";
+import { Area } from "../models/Area.js";
+import { Ingredient } from "../models/Ingredient.js";
 
 const router = Router();
-
-const categoryRepository =
-    AppDataSource.getRepository(Category);
-
-const areaRepository =
-    AppDataSource.getRepository(Area);
-
-const ingredientRepository =
-    AppDataSource.getRepository(Ingredient);
 
 
 // Categories
@@ -24,8 +13,7 @@ router.get("/categories", async (req, res) => {
 
     try {
 
-        const categories =
-            await categoryRepository.find();
+        const categories = await Category.find();
 
         res.json({
             categories,
@@ -48,8 +36,7 @@ router.get("/areas", async (req, res) => {
 
     try {
 
-        const areas =
-            await areaRepository.find();
+        const areas = await Area.find();
 
         res.json({
             areas,
@@ -68,13 +55,11 @@ router.get("/areas", async (req, res) => {
 
 // Ingredients
 
-
 router.get("/ingredients", async (req, res) => {
 
     try {
 
-        const ingredients =
-            await ingredientRepository.find();
+        const ingredients = await Ingredient.find();
 
         res.json({
             ingredients,

@@ -1,15 +1,14 @@
-import "reflect-metadata";
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
+import mongoose from "mongoose";
 
-import { AppDataSource } from "../data-source.js";
+import { connectDB } from "../db/mongoose.js";
 
-import { Meal } from "../entities/Meal.js";
-import { Category } from "../entities/Category.js";
-import { Area } from "../entities/Area.js";
-import { Ingredient } from "../entities/Ingredient.js";
-import { MealIngredient } from "../entities/MealIngredient.js";
+import { Meal } from "../models/Meal.js";
+import { Category } from "../models/Category.js";
+import { Area } from "../models/Area.js";
+import { Ingredient } from "../models/Ingredient.js";
 
 interface MealJSON {
     idMeal: string;
@@ -27,24 +26,7 @@ async function seed() {
 
     try {
 
-        await AppDataSource.initialize();
-
-        console.log("Database connected");
-
-        const mealRepository =
-            AppDataSource.getRepository(Meal);
-
-        const categoryRepository =
-            AppDataSource.getRepository(Category);
-
-        const areaRepository =
-            AppDataSource.getRepository(Area);
-
-        const ingredientRepository =
-            AppDataSource.getRepository(Ingredient);
-
-        const mealIngredientRepository =
-            AppDataSource.getRepository(MealIngredient);
+        await connectDB();
 
         const filePath = path.join(
             process.cwd(),
@@ -52,49 +34,51 @@ async function seed() {
             "meals.json"
         );
 
-        const file = fs.readFileSync(
-            filePath,
-            "utf-8"
-        );
+        const file = fs.readFileSync(filePath, "utf-8");
 
-       const jsonData = JSON.parse(file);
+        const jsonData = JSON.parse(file);
 
-const meals: MealJSON[] =
-    jsonData.meals;
+        const meals: MealJSON[] = jsonData.meals;
 
-console.log(
-    `Found ${meals.length} meals`
-);
+        console.log(`Found ${meals.length} meals`);
 
         for (const mealData of meals) {
+
+            // -------------------------
+            // Skip meals that already exist
+            // -------------------------
+
+            const existingMeal = await Meal.findOne({
+                themealdbId: mealData.idMeal,
+            });
+
+            if (existingMeal) {
+                console.log(
+                    `Skipped (already exists): ${mealData.strMeal}`
+                );
+                continue;
+            }
 
             // -------------------------
             // Category
             // -------------------------
 
-            let category: Category | null = null;
+            let category = null;
 
             if (mealData.strCategory) {
 
-                category =
-                    await categoryRepository.findOne({
-                        where: {
-                            name: mealData.strCategory
-                        }
-                    });
+                category = await Category.findOne({
+                    name: mealData.strCategory,
+                });
 
                 if (!category) {
 
-                    category =
-                        categoryRepository.create({
-                            name: mealData.strCategory,
-                            image: null,
-                            description: null
-                        });
+                    category = await Category.create({
+                        name: mealData.strCategory,
+                        image: null,
+                        description: null,
+                    });
 
-                    await categoryRepository.save(
-                        category
-                    );
                 }
             }
 
@@ -102,164 +86,95 @@ console.log(
             // Area
             // -------------------------
 
-            let area: Area | null = null;
+            let area = null;
 
             if (mealData.strArea) {
 
-                area =
-                    await areaRepository.findOne({
-                        where: {
-                            name: mealData.strArea
-                        }
-                    });
+                area = await Area.findOne({
+                    name: mealData.strArea,
+                });
 
                 if (!area) {
 
-                    area =
-                        areaRepository.create({
-                            name: mealData.strArea
-                        });
-
-                    await areaRepository.save(
-                        area
-                    );
-                }
-            }
-
-            // -------------------------
-            // Meal
-            // -------------------------
-
-            let meal =
-                await mealRepository.findOne({
-                    where: {
-                        themealdbId:
-                            mealData.idMeal
-                    }
-                });
-
-            if (!meal) {
-
-                meal =
-                    mealRepository.create({
-
-                        themealdbId:
-                            mealData.idMeal,
-
-                        name:
-                            mealData.strMeal,
-
-                        instructions:
-                            mealData.strInstructions,
-
-                        image:
-                            mealData.strMealThumb,
-
-                        youtubeUrl:
-                            mealData.strYoutube,
-
-                        category,
-
-                        area
+                    area = await Area.create({
+                        name: mealData.strArea,
                     });
 
-                await mealRepository.save(meal);
+                }
             }
 
             // -------------------------
             // Ingredients
             // -------------------------
 
+            const mealIngredients: {
+                ingredient: mongoose.Types.ObjectId;
+                measure: string | null;
+            }[] = [];
+
             for (let i = 1; i <= 20; i++) {
 
-                const ingredientName =
-                    mealData[
-                        `strIngredient${i}`
-                    ];
+                const ingredientName = mealData[`strIngredient${i}`];
+                const measure = mealData[`strMeasure${i}`];
 
-                const measure =
-                    mealData[
-                        `strMeasure${i}`
-                    ];
-
-                if (
-                    !ingredientName ||
-                    !ingredientName.trim()
-                ) {
+                if (!ingredientName || !ingredientName.trim()) {
                     continue;
                 }
 
-                const cleanIngredient =
-                    ingredientName.trim();
+                const cleanIngredient = ingredientName.trim();
 
-                let ingredient =
-                    await ingredientRepository.findOne({
-                        where: {
-                            name: cleanIngredient
-                        }
-                    });
+                let ingredient = await Ingredient.findOne({
+                    name: cleanIngredient,
+                });
 
                 if (!ingredient) {
 
-                    ingredient =
-                        ingredientRepository.create({
-                            name: cleanIngredient
-                        });
-
-                    await ingredientRepository.save(
-                        ingredient
-                    );
-                }
-
-                const existingRelation =
-                    await mealIngredientRepository.findOne({
-                        where: {
-                            meal: {
-                                id: meal.id
-                            },
-                            ingredient: {
-                                id: ingredient.id
-                            }
-                        }
+                    ingredient = await Ingredient.create({
+                        name: cleanIngredient,
                     });
 
-                if (!existingRelation) {
-
-                    const mealIngredient =
-                        mealIngredientRepository.create({
-
-                            meal,
-
-                            ingredient,
-
-                            measure:
-                                measure?.trim() || null
-
-                        });
-
-                    await mealIngredientRepository.save(
-                        mealIngredient
-                    );
                 }
+
+                mealIngredients.push({
+                    ingredient: ingredient._id,
+                    measure: measure?.trim() || null,
+                });
             }
 
-            console.log(
-                `Imported: ${mealData.strMeal}`
-            );
+            // -------------------------
+            // Meal
+            // -------------------------
+
+            await Meal.create({
+
+                themealdbId: mealData.idMeal,
+
+                name: mealData.strMeal,
+
+                instructions: mealData.strInstructions,
+
+                image: mealData.strMealThumb,
+
+                youtubeUrl: mealData.strYoutube,
+
+                category: category ? category._id : null,
+
+                area: area ? area._id : null,
+
+                mealIngredients,
+
+            });
+
+            console.log(`Imported: ${mealData.strMeal}`);
         }
 
-        console.log(
-            "✅ Seed completed successfully"
-        );
+        console.log("✅ Seed completed successfully");
 
-        await AppDataSource.destroy();
+        await mongoose.disconnect();
 
     } catch (error) {
 
-        console.error(
-            "❌ Seed failed:",
-            error
-        );
+        console.error("❌ Seed failed:", error);
 
         process.exit(1);
     }

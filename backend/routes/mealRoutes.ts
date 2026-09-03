@@ -1,24 +1,24 @@
 import { Router } from "express";
-import { AppDataSource } from "../data-source.js";
-import { Meal } from "../entities/Meal.js";
+import { Meal } from "../models/Meal.js";
+import { Category } from "../models/Category.js";
+import { Area } from "../models/Area.js";
+import { Ingredient } from "../models/Ingredient.js";
 
 const router = Router();
 
-const mealRepository =
-    AppDataSource.getRepository(Meal);
-
+// Escapes user input before it's used inside a RegExp
+function escapeRegex(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 // GET all meals
 router.get("/", async (req, res) => {
 
     try {
 
-        const meals = await mealRepository.find({
-            relations: {
-                category: true,
-                area: true,
-            },
-        });
+        const meals = await Meal.find()
+            .populate("category")
+            .populate("area");
 
         res.json({
             meals,
@@ -39,27 +39,22 @@ router.get("/random", async (req, res) => {
 
     try {
 
-        const meal =
-            await mealRepository
-                .createQueryBuilder("meal")
-                .leftJoinAndSelect(
-                    "meal.category",
-                    "category"
-                )
-                .leftJoinAndSelect(
-                    "meal.area",
-                    "area"
-                )
-                .orderBy("RAND()")
-                .getOne();
+        const [randomDoc] = await Meal.aggregate([
+            { $sample: { size: 1 } },
+        ]);
 
-        if (!meal) {
+        if (!randomDoc) {
 
             return res.status(404).json({
                 message: "No meals found",
             });
 
         }
+
+        const meal = await Meal.populate(randomDoc, [
+            { path: "category" },
+            { path: "area" },
+        ]);
 
         res.json({
             meals: [meal],
@@ -80,24 +75,24 @@ router.get("/category/:category", async (req, res) => {
 
     try {
 
-        const category = req.params.category;
+        const categoryName = req.params.category;
 
-        const meals =
-            await mealRepository
-                .createQueryBuilder("meal")
-                .leftJoinAndSelect(
-                    "meal.category",
-                    "category"
-                )
-                .leftJoinAndSelect(
-                    "meal.area",
-                    "area"
-                )
-                .where(
-                    "LOWER(category.name) = LOWER(:category)",
-                    { category }
-                )
-                .getMany();
+        const categoryDoc = await Category.findOne({
+            name: new RegExp(
+                `^${escapeRegex(categoryName)}$`,
+                "i"
+            ),
+        });
+
+        if (!categoryDoc) {
+            return res.json({ meals: [] });
+        }
+
+        const meals = await Meal.find({
+            category: categoryDoc._id,
+        })
+            .populate("category")
+            .populate("area");
 
         res.json({
             meals,
@@ -118,24 +113,21 @@ router.get("/area/:area", async (req, res) => {
 
     try {
 
-        const area = req.params.area;
+        const areaName = req.params.area;
 
-        const meals =
-            await mealRepository
-                .createQueryBuilder("meal")
-                .leftJoinAndSelect(
-                    "meal.category",
-                    "category"
-                )
-                .leftJoinAndSelect(
-                    "meal.area",
-                    "area"
-                )
-                .where(
-                    "LOWER(area.name) = LOWER(:area)",
-                    { area }
-                )
-                .getMany();
+        const areaDoc = await Area.findOne({
+            name: new RegExp(`^${escapeRegex(areaName)}$`, "i"),
+        });
+
+        if (!areaDoc) {
+            return res.json({ meals: [] });
+        }
+
+        const meals = await Meal.find({
+            area: areaDoc._id,
+        })
+            .populate("category")
+            .populate("area");
 
         res.json({
             meals,
@@ -156,32 +148,24 @@ router.get("/ingredient/:ingredient", async (req, res) => {
 
     try {
 
-        const ingredient = req.params.ingredient;
+        const ingredientName = req.params.ingredient;
 
-        const meals =
-            await mealRepository
-                .createQueryBuilder("meal")
-                .leftJoinAndSelect(
-                    "meal.category",
-                    "category"
-                )
-                .leftJoinAndSelect(
-                    "meal.area",
-                    "area"
-                )
-                .innerJoin(
-                    "meal.mealIngredients",
-                    "mealIngredient"
-                )
-                .innerJoin(
-                    "mealIngredient.ingredient",
-                    "ingredient"
-                )
-                .where(
-                    "LOWER(ingredient.name) = LOWER(:ingredient)",
-                    { ingredient }
-                )
-                .getMany();
+        const ingredientDoc = await Ingredient.findOne({
+            name: new RegExp(
+                `^${escapeRegex(ingredientName)}$`,
+                "i"
+            ),
+        });
+
+        if (!ingredientDoc) {
+            return res.json({ meals: [] });
+        }
+
+        const meals = await Meal.find({
+            "mealIngredients.ingredient": ingredientDoc._id,
+        })
+            .populate("category")
+            .populate("area");
 
         res.json({
             meals,
@@ -202,9 +186,7 @@ router.get("/search", async (req, res) => {
 
     try {
 
-        const searchTerm =
-            String(req.query.name || "")
-                .trim();
+        const searchTerm = String(req.query.name || "").trim();
 
         if (!searchTerm) {
 
@@ -214,24 +196,11 @@ router.get("/search", async (req, res) => {
 
         }
 
-        const meals =
-            await mealRepository
-                .createQueryBuilder("meal")
-                .leftJoinAndSelect(
-                    "meal.category",
-                    "category"
-                )
-                .leftJoinAndSelect(
-                    "meal.area",
-                    "area"
-                )
-                .where(
-                    "LOWER(meal.name) LIKE LOWER(:name)",
-                    {
-                        name: `%${searchTerm}%`,
-                    }
-                )
-                .getMany();
+        const meals = await Meal.find({
+            name: new RegExp(escapeRegex(searchTerm), "i"),
+        })
+            .populate("category")
+            .populate("area");
 
         res.json({
             meals,
@@ -248,25 +217,16 @@ router.get("/search", async (req, res) => {
     }
 
 });
+
 // GET meal by ID
 router.get("/:id", async (req, res) => {
 
     try {
 
-        const meal =
-            await mealRepository.findOne({
-                where: {
-                    id: Number(req.params.id),
-                },
-
-                relations: {
-                    category: true,
-                    area: true,
-                    mealIngredients: {
-                        ingredient: true,
-                    },
-                },
-            });
+        const meal = await Meal.findById(req.params.id)
+            .populate("category")
+            .populate("area")
+            .populate("mealIngredients.ingredient");
 
         if (!meal) {
             return res.status(404).json({
@@ -289,269 +249,3 @@ router.get("/:id", async (req, res) => {
 });
 
 export default router;
-
-
-
-// import express from "express";
-// import { readFile } from "node:fs/promises";
-
-// const router = express.Router();
-
-// async function getMeals() {
-
-//     const data = await readFile(
-//         "./data/meals.json",
-//         "utf-8"
-//     );
-
-//     return JSON.parse(data);
-// }
-
-// router.get("/search", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         const searchTerm =
-//             String(req.query.name || "")
-//                 .toLowerCase()
-//                 .trim();
-
-//         if (!searchTerm) {
-
-//             return res.status(400).json({
-//                 message: "Search name is required"
-//             });
-
-//         }
-
-//         const meals = data.meals.filter(
-//             (meal: any) =>
-//                 meal.strMeal
-//                     ?.toLowerCase()
-//                     .includes(searchTerm)
-//         );
-
-//         res.json({
-//             meals
-//         });
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message: "Failed to search meals"
-//         });
-
-//     }
-
-// });
-// router.get("/random", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         const randomIndex =
-//             Math.floor(
-//                 Math.random() * data.meals.length
-//             );
-
-//         const randomMeal =
-//             data.meals[randomIndex];
-
-//         res.json({
-//             meals: [randomMeal]
-//         });
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message: "Failed to get random meal"
-//         });
-
-//     }
-
-// });
-// router.get("/category/:category", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         const category =
-//             String(req.params.category)
-//                 .toLowerCase()
-//                 .trim();
-
-//         const meals =
-//             data.meals.filter(
-//                 (meal: any) =>
-//                     meal.strCategory
-//                         ?.toLowerCase()
-//                         .trim() === category
-//             );
-
-//         res.json({
-//             meals
-//         });
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message: "Failed to filter meals by category"
-//         });
-
-//     }
-
-// });
-// router.get("/", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         res.json(data);
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message: "Failed to load meals"
-//         });
-
-//     }
-
-// });
-// router.get("/area/:area", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         const area =
-//             String(req.params.area)
-//                 .toLowerCase()
-//                 .trim();
-
-//         const meals =
-//             data.meals.filter(
-//                 (meal: any) =>
-//                     meal.strArea
-//                         ?.toLowerCase()
-//                         .trim() === area
-//             );
-
-//         res.json({
-//             meals
-//         });
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message: "Failed to filter meals by area"
-//         });
-
-//     }
-
-// });
-// router.get("/ingredient/:ingredient", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         const ingredient =
-//             String(req.params.ingredient)
-//                 .toLowerCase()
-//                 .trim();
-
-//         const meals =
-//             data.meals.filter((meal: any) => {
-
-//                 for (let i = 1; i <= 20; i++) {
-
-//                     const mealIngredient =
-//                         meal[`strIngredient${i}`];
-
-//                     if (
-//                         mealIngredient &&
-//                         mealIngredient
-//                             .toLowerCase()
-//                             .trim() === ingredient
-//                     ) {
-//                         return true;
-//                     }
-
-//                 }
-
-//                 return false;
-
-//             });
-
-//         res.json({
-//             meals
-//         });
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message:
-//                 "Failed to filter meals by ingredient"
-//         });
-
-//     }
-
-// });
-
-// router.get("/:id", async (req, res) => {
-
-//     try {
-
-//         const data = await getMeals();
-
-//         const meal = data.meals.find(
-//             (meal: any) =>
-//                 meal.idMeal === req.params.id
-//         );
-
-
-//         if (!meal) {
-
-//             return res.status(404).json({
-//                 message: "Meal not found"
-//             });
-
-//         }
-
-//         res.json({
-//             meals: [meal]
-//         });
-
-//     } catch (error) {
-
-//         console.error(error);
-
-//         res.status(500).json({
-//             message: "Failed to load meal"
-//         });
-
-//     }
-
-// });
-
-
-
-
-// export default router;
