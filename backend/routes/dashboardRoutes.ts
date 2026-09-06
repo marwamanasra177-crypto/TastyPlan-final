@@ -1315,13 +1315,13 @@ router.get("/meals/:id/edit", requireAdmin, async (req, res) => {
 
         const ingredientsWithData = ingredients.map((ingredient) => ({
 
-            id: ingredient.id,
+            id: ingredient._id,
 
             name: ingredient.name,
 
-            selected: mealIngredientsMap.has(ingredient.id),
+            selected: mealIngredientsMap.has(ingredient._id.toString()),
 
-            measure: mealIngredientsMap.get(ingredient.id) || "",
+            measure: mealIngredientsMap.get(ingredient._id.toString()) || "",
 
         }));
 
