@@ -1,10 +1,8 @@
 import { Schema, model, Types } from "mongoose";
-
 export interface IMealIngredient {
     ingredient: Types.ObjectId;
     measure: string | null;
 }
-
 export interface IMeal {
     themealdbId: string;
     name: string;
@@ -15,7 +13,6 @@ export interface IMeal {
     area: Types.ObjectId | null;
     mealIngredients: IMealIngredient[];
 }
-
 const mealIngredientSchema = new Schema<IMealIngredient>(
     {
         ingredient: {
@@ -33,7 +30,6 @@ const mealIngredientSchema = new Schema<IMealIngredient>(
         toObject: { virtuals: true },
     }
 );
-
 const mealSchema = new Schema<IMeal>(
     {
         themealdbId: {
@@ -77,5 +73,4 @@ const mealSchema = new Schema<IMeal>(
         toObject: { virtuals: true },
     }
 );
-
 export const Meal = model<IMeal>("Meal", mealSchema);

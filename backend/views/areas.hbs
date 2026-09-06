@@ -1,83 +1,53 @@
 <div class="page-header">
-
     <div>
         <h2>Areas</h2>
         <p>Manage recipe areas</p>
     </div>
-
     <a
         href="/dashboard/areas/new"
         class="btn-primary"
     >
         + Add Area
     </a>
-
 </div>
-
-
 <div class="table-card">
-
     <table>
-
         <thead>
-
             <tr>
                 <th>ID</th>
                 <th>Name</th>
                 <th>Actions</th>
             </tr>
-
         </thead>
-
-
         <tbody>
-
             {{#each areas}}
-
                 <tr>
-
                     <td>{{id}}</td>
-
                     <td>{{name}}</td>
-
                     <td class="actions">
-
                         <a
                             href="/dashboard/areas/{{id}}/edit"
                         >
                             Edit
                         </a>
-
                         <form
                             action="/dashboard/areas/{{id}}/delete"
                             method="POST"
                             style="display:inline;"
                         >
-
                             <button type="submit">
                                 Delete
                             </button>
-
                         </form>
-
                     </td>
-
                 </tr>
-
             {{else}}
-
                 <tr>
-
                     <td colspan="3">
                         No areas found.
                     </td>
-
                 </tr>
-
             {{/each}}
-
         </tbody>
-
     </table>
-
 </div>

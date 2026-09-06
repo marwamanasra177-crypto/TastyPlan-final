@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-
 export interface IUser {
     name: string;
     email: string;
@@ -7,7 +6,6 @@ export interface IUser {
     role: "user" | "admin";
     createdAt: Date;
 }
-
 const userSchema = new Schema<IUser>(
     {
         name: {
@@ -43,5 +41,4 @@ const userSchema = new Schema<IUser>(
         toObject: { virtuals: true },
     }
 );
-
 export const User = model<IUser>("User", userSchema);

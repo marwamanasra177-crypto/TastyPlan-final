@@ -1,7 +1,5 @@
 <div class="page-header">
-
     <div>
-
         <h2>
             {{#if isEdit}}
                 Edit Ingredient
@@ -9,7 +7,6 @@
                 Add Ingredient
             {{/if}}
         </h2>
-
         <p>
             {{#if isEdit}}
                 Update ingredient information
@@ -17,25 +14,17 @@
                 Create a new ingredient
             {{/if}}
         </p>
-
     </div>
-
 </div>
-
-
 <div class="form-card">
-
     <form
         action="{{#if isEdit}}/dashboard/ingredients/{{ingredient.id}}/edit{{else}}/dashboard/ingredients{{/if}}"
         method="POST"
     >
-
         <div class="form-group">
-
             <label for="name">
                 Ingredient Name
             </label>
-
             <input
                 type="text"
                 id="name"
@@ -44,19 +33,14 @@
                 placeholder="Enter ingredient name"
                 required
             >
-
         </div>
-
-
         <div class="form-actions">
-
             <a
                 href="/dashboard/ingredients"
                 class="btn-secondary"
             >
                 Cancel
             </a>
-
             <button
                 type="submit"
                 class="btn-primary"
@@ -67,9 +51,6 @@
                     Create Ingredient
                 {{/if}}
             </button>
-
         </div>
-
     </form>
-
 </div>

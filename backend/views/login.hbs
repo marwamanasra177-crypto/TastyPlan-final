@@ -1,59 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-
     <title>{{title}} | TastyPlan</title>
-
     <link
         rel="stylesheet"
         href="/css/dashboard.css"
     >
-
 </head>
-
 <body>
-
     <div class="login-page">
-
         <div class="login-card">
-
             <div class="login-logo">
-
                 <h1>🍴 TastyPlan</h1>
-
                 <p>Admin Dashboard</p>
-
             </div>
-
-
             {{#if error}}
-
                 <div class="login-error">
                     {{error}}
                 </div>
-
             {{/if}}
-
-
             <form
                 action="/dashboard/login"
                 method="POST"
             >
-
                 <div class="form-group">
-
                     <label for="email">
                         Email
                     </label>
-
                     <input
                         type="email"
                         id="email"
@@ -61,16 +39,11 @@
                         placeholder="Enter your email"
                         required
                     >
-
                 </div>
-
-
                 <div class="form-group">
-
                     <label for="password">
                         Password
                     </label>
-
                     <input
                         type="password"
                         id="password"
@@ -78,23 +51,15 @@
                         placeholder="Enter your password"
                         required
                     >
-
                 </div>
-
-
                 <button
                     type="submit"
                     class="login-button"
                 >
                     Login
                 </button>
-
             </form>
-
         </div>
-
     </div>
-
 </body>
-
 </html>

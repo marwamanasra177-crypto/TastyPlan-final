@@ -1,11 +1,9 @@
 import { Schema, model, Types } from "mongoose";
-
 export interface IFavorite {
     user: Types.ObjectId;
     meal: Types.ObjectId;
     createdAt: Date;
 }
-
 const favoriteSchema = new Schema<IFavorite>(
     {
         user: {
@@ -25,8 +23,6 @@ const favoriteSchema = new Schema<IFavorite>(
         toObject: { virtuals: true },
     }
 );
-
 // A user can only favorite a given meal once
 favoriteSchema.index({ user: 1, meal: 1 }, { unique: true });
-
 export const Favorite = model<IFavorite>("Favorite", favoriteSchema);

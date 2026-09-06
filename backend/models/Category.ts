@@ -1,11 +1,9 @@
 import { Schema, model } from "mongoose";
-
 export interface ICategory {
     name: string;
     image: string | null;
     description: string | null;
 }
-
 const categorySchema = new Schema<ICategory>(
     {
         name: {
@@ -27,5 +25,4 @@ const categorySchema = new Schema<ICategory>(
         toObject: { virtuals: true },
     }
 );
-
 export const Category = model<ICategory>("Category", categorySchema);

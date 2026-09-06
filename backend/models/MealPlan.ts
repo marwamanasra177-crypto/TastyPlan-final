@@ -1,12 +1,10 @@
 import { Schema, model, Types } from "mongoose";
-
 export interface IMealPlan {
     user: Types.ObjectId;
     day: string;
     meal: Types.ObjectId;
     createdAt: Date;
 }
-
 const mealPlanSchema = new Schema<IMealPlan>(
     {
         user: {
@@ -30,5 +28,4 @@ const mealPlanSchema = new Schema<IMealPlan>(
         toObject: { virtuals: true },
     }
 );
-
 export const MealPlan = model<IMealPlan>("MealPlan", mealPlanSchema);

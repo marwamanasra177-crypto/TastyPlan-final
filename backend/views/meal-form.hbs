@@ -1,8 +1,5 @@
 <div class="page-header">
-
-
 <div>
-
     <h2>
         {{#if isEdit}}
             Edit Meal
@@ -10,7 +7,6 @@
             Add Meal
         {{/if}}
     </h2>
-
     <p>
         {{#if isEdit}}
             Update recipe information
@@ -18,39 +14,23 @@
             Create a new recipe
         {{/if}}
     </p>
-
 </div>
-
-
 </div>
-
 {{#if error}}
-
-
 <div class="form-error">
     {{error}}
 </div>
-
-
 {{/if}}
-
 <div class="form-card">
-
-
 <form
     action="{{#if isEdit}}/dashboard/meals/{{meal.id}}/edit{{else}}/dashboard/meals{{/if}}"
     method="POST"
 >
-
-
     <!-- Meal Name -->
-
     <div class="form-group">
-
         <label for="name">
             Meal Name
         </label>
-
         <input
             type="text"
             id="name"
@@ -59,18 +39,12 @@
             placeholder="Enter meal name"
             required
         >
-
     </div>
-
-
     <!-- TheMealDB ID -->
-
     <div class="form-group">
-
         <label for="themealdbId">
             TheMealDB ID
         </label>
-
         <input
             type="text"
             id="themealdbId"
@@ -79,18 +53,12 @@
             placeholder="Example: 52772"
             required
         >
-
     </div>
-
-
     <!-- Image -->
-
     <div class="form-group">
-
         <label for="image">
             Image URL
         </label>
-
         <input
             type="url"
             id="image"
@@ -98,18 +66,12 @@
             value="{{meal.image}}"
             placeholder="https://..."
         >
-
     </div>
-
-
     <!-- YouTube -->
-
     <div class="form-group">
-
         <label for="youtubeUrl">
             YouTube URL
         </label>
-
         <input
             type="url"
             id="youtubeUrl"
@@ -117,29 +79,20 @@
             value="{{meal.youtubeUrl}}"
             placeholder="https://youtube.com/..."
         >
-
     </div>
-
-
     <!-- Category -->
-
     <div class="form-group">
-
         <label for="category">
             Category
         </label>
-
         <select
             id="category"
             name="categoryId"
         >
-
             <option value="">
                 Select Category
             </option>
-
             {{#each categories}}
-
                 <option
                     value="{{id}}"
                     {{#if (eq id ../meal.category.id)}}
@@ -148,33 +101,22 @@
                 >
                     {{name}}
                 </option>
-
             {{/each}}
-
         </select>
-
     </div>
-
-
     <!-- Area -->
-
     <div class="form-group">
-
         <label for="area">
             Area
         </label>
-
         <select
             id="area"
             name="areaId"
         >
-
             <option value="">
                 Select Area
             </option>
-
             {{#each areas}}
-
                 <option
                     value="{{id}}"
                     {{#if (eq id ../meal.area.id)}}
@@ -183,49 +125,30 @@
                 >
                     {{name}}
                 </option>
-
             {{/each}}
-
         </select>
-
     </div>
-
-
     <!-- Instructions -->
-
     <div class="form-group">
-
         <label for="instructions">
             Instructions
         </label>
-
         <textarea
             id="instructions"
             name="instructions"
             rows="8"
             placeholder="Enter cooking instructions"
         >{{meal.instructions}}</textarea>
-
     </div>
-
-
     <!-- Ingredients -->
-
     <div class="form-group">
-
         <label>
             Ingredients
         </label>
-
-
         <div class="ingredients-list">
-
             {{#each ingredients}}
-
                 <div class="ingredient-row">
-
                     <label>
-
                         <input
                             type="checkbox"
                             name="ingredientIds"
@@ -234,57 +157,36 @@
                                 checked
                             {{/if}}
                         >
-
                         {{name}}
-
                     </label>
-
-
                     <input
                         type="text"
                         name="measure_{{id}}"
                         value="{{measure}}"
                         placeholder="Measure"
                     >
-
                 </div>
-
             {{/each}}
-
         </div>
-
     </div>
-
-
     <!-- Actions -->
-
     <div class="form-actions">
-
         <a
             href="/dashboard/meals"
             class="btn-secondary"
         >
             Cancel
         </a>
-
-
         <button
             type="submit"
             class="btn-primary"
         >
-
             {{#if isEdit}}
                 Update Meal
             {{else}}
                 Create Meal
             {{/if}}
-
         </button>
-
     </div>
-
-
 </form>
-
-
 </div>
