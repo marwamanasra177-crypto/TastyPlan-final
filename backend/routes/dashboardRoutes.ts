@@ -169,9 +169,10 @@ router.get("/users", requireAdmin, async (req, res) => {
 
     try {
 
-        const users = await User.find()
-            .select("name email role createdAt")
-            .sort({ createdAt: -1 });
+       const users = await User.find()
+    .select("name email role createdAt")
+    .sort({ createdAt: -1 })
+    .lean();
 
         res.render("users", {
             title: "Users",
@@ -334,24 +335,27 @@ router.get("/users/:id", requireAdmin, async (req, res) => {
 
     try {
 
-        const user = await User.findById(req.params.id)
-            .select("name email role createdAt");
+       const user = await User.findById(req.params.id)
+    .select("name email role createdAt")
+    .lean();
 
         if (!user) {
             return res.status(404).send("User not found");
         }
 
         const favorites = await Favorite.find({
-            user: user._id,
-        })
-            .populate("meal")
-            .sort({ createdAt: -1 });
+    user: user._id,
+})
+    .populate("meal")
+    .sort({ createdAt: -1 })
+    .lean();
 
         const planEntries = await MealPlan.find({
-            user: user._id,
-        })
-            .populate("meal")
-            .sort({ createdAt: 1 });
+    user: user._id,
+})
+    .populate("meal")
+    .sort({ createdAt: 1 })
+    .lean();
 
         const mealPlanByDay = DAYS.map((day) => ({
             day,
@@ -503,25 +507,24 @@ router.post("/users/:id/delete", requireAdmin, async (req, res) => {
 // Categories List
 
 router.get("/categories", requireAdmin, async (req, res) => {
-
     try {
+        const categories = await Category
+            .find()
+            .sort({ name: 1 })
+            .lean();
 
-        const categories = await Category.find().sort({ name: 1 });
+        console.log("Categories:", categories.length);
+        console.log(categories[0]);
 
         res.render("categories", {
             title: "Categories",
             admin: res.locals.admin,
             categories,
         });
-
     } catch (error) {
-
         console.error(error);
-
         res.status(500).send("Failed to load categories");
-
     }
-
 });
 
 
@@ -694,8 +697,7 @@ router.get("/areas", requireAdmin, async (req, res) => {
 
     try {
 
-        const areas = await Area.find().sort({ name: 1 });
-
+const areas = await Area.find().sort({ name: 1 }).lean();
         res.render("areas", {
             title: "Areas",
             admin: res.locals.admin,
@@ -873,8 +875,7 @@ router.get("/ingredients", requireAdmin, async (req, res) => {
 
     try {
 
-        const ingredients = await Ingredient.find().sort({ name: 1 });
-
+const ingredients = await Ingredient.find().sort({ name: 1 }).lean();
         res.render("ingredients", {
             title: "Ingredients",
             admin: res.locals.admin,
@@ -1059,10 +1060,12 @@ router.get("/meals", requireAdmin, async (req, res) => {
 
     try {
 
-        const meals = await Meal.find()
-            .populate("category")
-            .populate("area")
-            .sort({ name: 1 });
+const meals = await Meal
+    .find()
+    .populate("category")
+    .populate("area")
+    .sort({ name: 1 })
+    .lean();
 
         res.render("meals", {
             title: "Meals",
@@ -1083,9 +1086,9 @@ router.get("/meals/new", requireAdmin, async (req, res) => {
 
     try {
 
-        const categories = await Category.find().sort({ name: 1 });
-        const areas = await Area.find().sort({ name: 1 });
-        const ingredients = await Ingredient.find().sort({ name: 1 });
+        const categories = await Category.find().sort({ name: 1 }).lean();
+        const areas = await Area.find().sort({ name: 1 }).lean();
+        const ingredients = await Ingredient.find().sort({ name: 1 }).lean();
 
         res.render("meal-form", {
             title: "Add Meal",
@@ -1289,9 +1292,9 @@ router.get("/meals/:id/edit", requireAdmin, async (req, res) => {
         }
 
 
-        const categories = await Category.find().sort({ name: 1 });
-        const areas = await Area.find().sort({ name: 1 });
-        const ingredients = await Ingredient.find().sort({ name: 1 });
+        const categories = await Category.find().sort({ name: 1 }).lean();
+        const areas = await Area.find().sort({ name: 1 }).lean();
+        const ingredients = await Ingredient.find().sort({ name: 1 }).lean();
 
 
         // Prepare ingredients with their measures

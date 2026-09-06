@@ -36,7 +36,7 @@
 
                 <tr>
 
-                    <td>{{id}}</td>
+                    <td>{{_id}}</td>
 
                     <td>{{name}}</td>
 
@@ -56,16 +56,16 @@
 
                     <td class="actions">
 
-                        <a href="/dashboard/users/{{id}}">
+                        <a href="/dashboard/users/{{_id}}">
                             View
                         </a>
 
-                        <a href="/dashboard/users/{{id}}/edit">
+                        <a href="/dashboard/users/{{_id}}/edit">
                             Edit
                         </a>
 
                         <form
-                            action="/dashboard/users/{{id}}/delete"
+                            action="/dashboard/users/{{_id}}/delete"
                             method="POST"
                             style="display:inline;"
                         >

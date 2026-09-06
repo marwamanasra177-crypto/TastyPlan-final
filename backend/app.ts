@@ -9,6 +9,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import favoritesRoutes from "./routes/favoritesRoutes.js";
 import mealPlanRoutes from "./routes/mealPlanRoutes.js";
+import "dotenv/config";
 
 const app = express();
 
