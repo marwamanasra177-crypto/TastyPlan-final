@@ -37,7 +37,7 @@ router.get("/", requireAuth, async (req: AuthedRequest, res) => {
         });
 
         return res.json({
-            meals: favorites.map((favorite) => favorite.meal),
+            meals: favorites.map((favorite: Favorite) => favorite.meal),
         });
 
     } catch (error) {
